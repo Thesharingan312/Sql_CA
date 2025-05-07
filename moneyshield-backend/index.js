@@ -1,12 +1,15 @@
-// Import required libraries
+// Import required libraries | Importar bibliotecas necesarias
 const express = require('express');
 const mysql = require('mysql2');
 
-// Create the Express application
+// Create the Express application | Crear la aplicación Express
 const app = express();
-app.use(express.json()); // Allows receiving and processing JSON data
+app.use(express.json()); // Allows receiving and processing JSON data | Permite recibir y procesar datos JSON
 
-// MySQL database connection configuration
+/**
+ * MySQL database connection configuration
+ * Configuración de conexión a la base de datos MySQL
+ */
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -14,25 +17,67 @@ const db = mysql.createConnection({
     database: 'moneyshield'
 });
 
-// Try to connect to the database
-db.connect(err => {
+/**
+ * Handle database connection errors and reconnection
+ * Manejar errores de conexión a la base de datos y reconexión
+ */
+function handleDisconnect() {
+    db.connect(err => {
     if (err) {
-    console.error('Error connecting to MySQL:', err);
-    return;
+        console.error('Error connecting to MySQL:', err);
+      // Try to reconnect after 5 seconds | Intentar reconectar después de 5 segundos
+        setTimeout(handleDisconnect, 5000);
+        return;
     }
     console.log('Connected to MySQL!');
-});
+    });
 
-// Test route to check if the server is running
+  // Handle connection errors | Manejar errores de conexión
+    db.on('error', (err) => {
+    console.error('MySQL connection error:', err);
+    if (err.code === 'PROTOCOL_CONNECTION_LOST' || 
+        err.code === 'ECONNREFUSED' || 
+        err.code === 'ETIMEDOUT') {
+      handleDisconnect(); // Reconnect if connection is lost | Reconectar si se pierde la conexión
+    } else {
+        throw err;
+    }
+    });
+}
+
+// Initialize connection | Inicializar conexión
+handleDisconnect();
+
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     description: Test route to check if the server is running
+ *     responses:
+ *       200:
+ *         description: Server is running
+ */
+// Test route to check if the server is running | Ruta de prueba para verificar si el servidor está funcionando
 app.get('/', (req, res) => {
     res.send('MoneyShield API is running!');
 });
 
 // =======================
-// ROUTES FOR USERS
+// ROUTES FOR USERS | RUTAS PARA USUARIOS
 // =======================
 
-// Get all users (READ)
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     description: Get all users
+ *     responses:
+ *       200:
+ *         description: Returns all users
+ *       500:
+ *         description: Server error
+ */
+// Get all users (READ) | Obtener todos los usuarios (LEER)
 app.get('/users', (req, res) => {
   db.query('SELECT * FROM users', (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
@@ -40,7 +85,31 @@ app.get('/users', (req, res) => {
     });
 });
 
-// Create a new user (CREATE)
+/**
+ * @swagger
+ * /users:
+ *   post:
+ *     description: Create a new user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - first_name
+ *               - email
+ *               - password_hash
+ *               - profile_id
+ *     responses:
+ *       200:
+ *         description: User created successfully
+ *       400:
+ *         description: Missing required fields
+ *       500:
+ *         description: Server error
+ */
+// Create a new user (CREATE) | Crear un nuevo usuario (CREAR)
 app.post('/users', (req, res) => {
     const { first_name, last_name, email, password_hash, profile_id } = req.body;
     if (!first_name || !email || !password_hash || !profile_id) {
@@ -56,7 +125,31 @@ app.post('/users', (req, res) => {
     );
 });
 
-// Update an existing user (UPDATE)
+/**
+ * @swagger
+ * /users/{id}:
+ *   put:
+ *     description: Update an existing user
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: User updated successfully
+ *       400:
+ *         description: No fields to update
+ *       500:
+ *         description: Server error
+ */
+// Update an existing user (UPDATE) | Actualizar un usuario existente (ACTUALIZAR)
 app.put('/users/:id', (req, res) => {
     const { first_name, last_name, email, password_hash, profile_id } = req.body;
     const { id } = req.params;
@@ -84,7 +177,24 @@ app.put('/users/:id', (req, res) => {
     );
 });
 
-// Delete a user by ID (DELETE)
+/**
+ * @swagger
+ * /users/{id}:
+ *   delete:
+ *     description: Delete a user
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *       500:
+ *         description: Server error
+ */
+// Delete a user by ID (DELETE) | Eliminar un usuario por ID (ELIMINAR)
 app.delete('/users/:id', (req, res) => {
     const { id } = req.params;
     db.query('DELETE FROM users WHERE id = ?', [id], (err, result) => {
@@ -94,22 +204,227 @@ app.delete('/users/:id', (req, res) => {
 });
 
 // =======================
-// ROUTES FOR TRANSACTIONS
+// ROUTES FOR TRANSACTIONS | RUTAS PARA TRANSACCIONES
 // =======================
 
-// Get all transactions (READ)
+/**
+ * @swagger
+ * /transactions:
+ *   get:
+ *     description: Get all transactions
+ *     parameters:
+ *       - in: query
+ *         name: user_id
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Returns all transactions
+ *       500:
+ *         description: Server error
+ */
+// Get all transactions (READ) | Obtener todas las transacciones (LEER)
 app.get('/transactions', (req, res) => {
-  db.query('SELECT * FROM transactions', (err, results) => {
+    const { user_id } = req.query;
+
+    let sql = 'SELECT * FROM transactions';
+    let values = [];
+
+    if (user_id) {
+    sql += ' WHERE user_id = ?';
+    values.push(user_id);
+    }
+
+    db.query(sql, values, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
+    });
+});
+
+/**
+ * @swagger
+ * /transactions/{id}:
+ *   get:
+ *     description: Get a specific transaction by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Returns the transaction
+ *       404:
+ *         description: Transaction not found
+ *       500:
+ *         description: Server error
+ */
+// Get a specific transaction by ID | Obtener una transacción específica por ID
+app.get('/transactions/:id', (req, res) => {
+    const { id } = req.params;
+  db.query('SELECT * FROM transactions WHERE id = ?', [id], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ error: 'Transaction not found' });
+    res.json(results[0]);
+    });
+});
+
+/**
+ * @swagger
+ * /transactions:
+ *   post:
+ *     description: Create a new transaction
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - user_id
+ *               - amount
+ *               - type
+ *               - category_id
+ *               - date
+ *     responses:
+ *       200:
+ *         description: Transaction created successfully
+ *       400:
+ *         description: Missing required fields
+ *       500:
+ *         description: Server error
+ */
+// Create a new transaction (CREATE) | Crear una nueva transacción (CREAR)
+app.post('/transactions', (req, res) => {
+    const { user_id, amount, type, category_id, description, date } = req.body;
+
+  // Validate required fields | Validar campos requeridos
+    if (!user_id || !amount || !type || !category_id || !date) {
+    return res.status(400).json({ 
+        error: 'Missing required fields (user_id, amount, type, category_id, date)' 
+    });
+    }
+
+    db.query(
+    'INSERT INTO transactions (user_id, amount, type, category_id, description, date) VALUES (?, ?, ?, ?, ?, ?)',
+    [user_id, amount, type, category_id, description || null, date],
+    (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ 
+        id: result.insertId, 
+        user_id, 
+        amount, 
+        type, 
+        category_id, 
+        description, 
+        date 
         });
+    }
+    );
+});
+
+/**
+ * @swagger
+ * /transactions/{id}:
+ *   put:
+ *     description: Update an existing transaction
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Transaction updated successfully
+ *       400:
+ *         description: No fields to update
+ *       500:
+ *         description: Server error
+ */
+// Update an existing transaction (UPDATE) | Actualizar una transacción existente (ACTUALIZAR)
+app.put('/transactions/:id', (req, res) => {
+    const { user_id, amount, type, category_id, description, date } = req.body;
+    const { id } = req.params;
+    
+    let fields = [];
+    let values = [];
+
+    if (user_id !== undefined) { fields.push('user_id = ?'); values.push(user_id); }
+    if (amount !== undefined) { fields.push('amount = ?'); values.push(amount); }
+    if (type !== undefined) { fields.push('type = ?'); values.push(type); }
+    if (category_id !== undefined) { fields.push('category_id = ?'); values.push(category_id); }
+    if (description !== undefined) { fields.push('description = ?'); values.push(description); }
+    if (date !== undefined) { fields.push('date = ?'); values.push(date); }
+
+    if (fields.length === 0) {
+    return res.status(400).json({ error: 'No fields to update were sent' });
+    }
+
+    values.push(id);
+    db.query(
+    `UPDATE transactions SET ${fields.join(', ')} WHERE id = ?`,
+    values,
+    (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: 'Transaction updated' });
+    }
+    );
+});
+
+/**
+ * @swagger
+ * /transactions/{id}:
+ *   delete:
+ *     description: Delete a transaction
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Transaction deleted successfully
+ *       500:
+ *         description: Server error
+ */
+// Delete a transaction by ID (DELETE) | Eliminar una transacción por ID (ELIMINAR)
+app.delete('/transactions/:id', (req, res) => {
+    const { id } = req.params;
+    db.query('DELETE FROM transactions WHERE id = ?', [id], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ message: 'Transaction deleted' });
+    });
 });
 
 // =======================
-// ROUTES FOR BUDGETS
+// ROUTES FOR BUDGETS | RUTAS PARA PRESUPUESTOS
 // =======================
 
-// Get budgets with optional filtering by user_id
+/**
+ * @swagger
+ * /budgets:
+ *   get:
+ *     description: Get budgets with optional filtering by user_id
+ *     parameters:
+ *       - in: query
+ *         name: user_id
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Returns all matching budgets
+ *       500:
+ *         description: Server error
+ */
+// Get budgets with optional filtering by user_id | Obtener presupuestos con filtrado opcional por user_id
 app.get('/budgets', (req, res) => {
     const { user_id } = req.query;
 
@@ -127,7 +442,56 @@ app.get('/budgets', (req, res) => {
     });
 });
 
-// Sum total saving_amount by user, month, or both
+/**
+ * @swagger
+ * /budgets/{id}:
+ *   get:
+ *     description: Get a specific budget by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Returns the budget
+ *       404:
+ *         description: Budget not found
+ *       500:
+ *         description: Server error
+ */
+// Get a specific budget by ID | Obtener un presupuesto específico por ID
+app.get('/budgets/:id', (req, res) => {
+    const { id } = req.params;
+  db.query('SELECT * FROM budgets WHERE id = ?', [id], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ error: 'Budget not found' });
+    res.json(results[0]);
+    });
+});
+
+/**
+ * @swagger
+ * /budgets/sum:
+ *   get:
+ *     description: Sum total saving_amount by user, month, or both
+ *     parameters:
+ *       - in: query
+ *         name: user_id
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: month
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Returns the total saving amount
+ *       500:
+ *         description: Server error
+ */
+// Sum total saving_amount by user, month, or both | Sumar total saving_amount por usuario, mes, o ambos
 app.get('/budgets/sum', (req, res) => {
     const { user_id, month } = req.query;
 
@@ -155,8 +519,142 @@ app.get('/budgets/sum', (req, res) => {
     });
 });
 
+/**
+ * @swagger
+ * /budgets:
+ *   post:
+ *     description: Create a new budget
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - user_id
+ *               - category_id
+ *               - amount
+ *               - saving_amount
+ *               - date
+ *     responses:
+ *       200:
+ *         description: Budget created successfully
+ *       400:
+ *         description: Missing required fields
+ *       500:
+ *         description: Server error
+ */
+// Create a new budget (CREATE) | Crear un nuevo presupuesto (CREAR)
+app.post('/budgets', (req, res) => {
+    const { user_id, category_id, amount, saving_amount, date, note } = req.body;
+
+  // Validate required fields | Validar campos requeridos
+    if (!user_id || !category_id || !amount || !saving_amount || !date) {
+    return res.status(400).json({ 
+        error: 'Missing required fields (user_id, category_id, amount, saving_amount, date)' 
+    });
+    }
+
+    db.query(
+    'INSERT INTO budgets (user_id, category_id, amount, saving_amount, date, note) VALUES (?, ?, ?, ?, ?, ?)',
+    [user_id, category_id, amount, saving_amount, date, note || null],
+    (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ 
+        id: result.insertId, 
+        user_id, 
+        category_id, 
+        amount, 
+        saving_amount, 
+        date, 
+        note 
+        });
+    }
+    );
+});
+
+/**
+ * @swagger
+ * /budgets/{id}:
+ *   put:
+ *     description: Update an existing budget
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Budget updated successfully
+ *       400:
+ *         description: No fields to update
+ *       500:
+ *         description: Server error
+ */
+// Update an existing budget (UPDATE) | Actualizar un presupuesto existente (ACTUALIZAR)
+app.put('/budgets/:id', (req, res) => {
+    const { user_id, category_id, amount, saving_amount, date, note } = req.body;
+    const { id } = req.params;
+    
+    let fields = [];
+    let values = [];
+
+    if (user_id !== undefined) { fields.push('user_id = ?'); values.push(user_id); }
+    if (category_id !== undefined) { fields.push('category_id = ?'); values.push(category_id); }
+    if (amount !== undefined) { fields.push('amount = ?'); values.push(amount); }
+    if (saving_amount !== undefined) { fields.push('saving_amount = ?'); values.push(saving_amount); }
+    if (date !== undefined) { fields.push('date = ?'); values.push(date); }
+    if (note !== undefined) { fields.push('note = ?'); values.push(note); }
+
+    if (fields.length === 0) {
+    return res.status(400).json({ error: 'No fields to update were sent' });
+    }
+
+    values.push(id);
+    db.query(
+    `UPDATE budgets SET ${fields.join(', ')} WHERE id = ?`,
+    values,
+    (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: 'Budget updated' });
+    }
+    );
+});
+
+/**
+ * @swagger
+ * /budgets/{id}:
+ *   delete:
+ *     description: Delete a budget
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Budget deleted successfully
+ *       500:
+ *         description: Server error
+ */
+// Delete a budget by ID (DELETE) | Eliminar un presupuesto por ID (ELIMINAR)
+app.delete('/budgets/:id', (req, res) => {
+    const { id } = req.params;
+    db.query('DELETE FROM budgets WHERE id = ?', [id], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ message: 'Budget deleted' });
+    });
+});
+
 // =======================
-// START THE SERVER
+// START THE SERVER | INICIAR EL SERVIDOR
 // =======================
 
 const PORT = 3000;
