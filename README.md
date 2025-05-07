@@ -10,8 +10,10 @@ A RESTful API backend for the MoneyShield financial management application. This
 - [Database Setup](#database-setup)
 - [API Documentation](#api-documentation)
   - [Users](#users)
+  - [Profiles](#profiles)
   - [Transactions](#transactions)
   - [Budgets](#budgets)
+  - [Savings](#savings)
 - [Error Handling](#error-handling)
 - [Connection Management](#connection-management)
 - [Security Considerations](#security-considerations)
@@ -54,7 +56,7 @@ Create a MySQL database named `moneyshield` and configure the connection in the 
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: '******************',  // Change this to your MySQL password
+  password: '*******************',  // Change this to your MySQL password
   database: 'moneyshield'
 });
 ```
@@ -67,29 +69,44 @@ The application expects the following tables in the database:
 
 1. `users` - Store user information
    - `id` (Primary Key)
-   - `first_name`
-   - `last_name`
-   - `email`
-   - `password_hash`
-   - `profile_id`
+   - `first_name` VARCHAR(100)
+   - `last_name` VARCHAR(100)
+   - `email` VARCHAR(150)
+   - `password_hash` VARCHAR(100)
+   - `profile_id` INT (Foreign Key to profiles.id)
 
-2. `transactions` - Store financial transactions
+2. `profiles` - Store profile types
    - `id` (Primary Key)
-   - `user_id` (Foreign Key)
-   - `amount`
-   - `type` (income, expense)
-   - `category_id` (Foreign Key)
-   - `description` (optional)
-   - `date`
+   - `name` VARCHAR(50)
 
-3. `budgets` - Store budget information
+3. `transactions` - Store financial transactions
    - `id` (Primary Key)
-   - `user_id` (Foreign Key)
-   - `category_id` (Foreign Key)
-   - `amount`
-   - `saving_amount`
-   - `date`
-   - `note` (optional)
+   - `user_id` INT (Foreign Key)
+   - `type` ENUM(...)
+   - `amount` DECIMAL(10,2)
+   - `category` VARCHAR(100)
+   - `description` TEXT (optional)
+   - `created_at` TIMESTAMP
+
+4. `budgets` - Store budget information
+   - `id` (Primary Key)
+   - `user_id` INT (Foreign Key)
+   - `year` INT
+   - `month` INT
+   - `total_amount` DECIMAL(10,2)
+   - `notes` TEXT (optional)
+   - `created_at` TIMESTAMP
+
+5. `savings` - Store savings information
+   - `id` (Primary Key)
+   - `user_id` INT (Foreign Key)
+   - `budget_id` INT (Foreign Key, optional)
+   - `transaction_id` INT (Foreign Key, optional)
+   - `name` VARCHAR(100)
+   - `type` ENUM(...)
+   - `amount` DECIMAL(10,2)
+   - `notes` TEXT (optional)
+   - `created_at` TIMESTAMP
 
 ## API Documentation
 
