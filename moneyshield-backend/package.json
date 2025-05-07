@@ -11,6 +11,8 @@
   "description": "",
   "dependencies": {
     "express": "^5.1.0",
-    "mysql2": "^3.14.1"
+    "mysql2": "^3.14.1",
+    "swagger-ui-express": "^5.0.1",
+    "yaml": "^2.7.1"
   }
 }
