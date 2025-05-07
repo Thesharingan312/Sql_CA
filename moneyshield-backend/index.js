@@ -13,7 +13,7 @@ app.use(express.json()); // Allows receiving and processing JSON data | Permite 
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'Mamuelo06m*',
+    password: 'Litswd1967#SP',
     database: 'moneyshield'
 });
 
@@ -84,6 +84,35 @@ app.get('/users', (req, res) => {
     res.json(results);
     });
 });
+
+/**
+ * @swagger
+ * /users/{id}:
+ *   get:
+ *     description: Get a specific user by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Returns the user
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error
+ */
+// Get a specific user by ID | Obtener un usuario específico por ID
+app.get('/users/:id', (req, res) => {
+    const { id } = req.params;
+    db.query('SELECT * FROM users WHERE id = ?', [id], (err, results) => {
+      if (err) return res.status(500).json({ error: err.message });
+      if (results.length === 0) return res.status(404).json({ error: 'User not found' });
+      res.json(results[0]);
+    });
+  });
 
 /**
  * @swagger
