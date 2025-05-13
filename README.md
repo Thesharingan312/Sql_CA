@@ -31,10 +31,10 @@ MoneyShield API is a Node.js Express server application that connects to a MySQL
 ## Installation
 
 1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd moneyshield-api
-   ```
+    ```bash
+    git clone <repository-url>
+    cd moneyshield-api
+    ```
 
 2. Install dependencies:
    ```bash

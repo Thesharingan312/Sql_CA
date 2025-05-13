@@ -13,7 +13,7 @@ app.use(express.json()); // Allows receiving and processing JSON data | Permite 
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'Litswd1967#SP',
+    password: 'Mamuelo06m*',
     database: 'moneyshield'
 });
 
