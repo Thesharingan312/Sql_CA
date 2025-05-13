@@ -10,13 +10,15 @@ RESTful modular API for managing users, transactions, and personal finance.
 - Modular architecture (controllers, services, DAOs)
 - MySQL database connection via connection pool
 - Environment-based configuration
-- Easy to extend with new entities
+- Easy to extend with new entities (budgets, savings, categories, etc)
 - Interactive, auto-generated API documentation (Swagger/OpenAPI)
-- Transactions module fully implemented with CRUD and Swagger doc
+- Users and transactions modules fully implemented with CRUD and Swagger doc
+- Referential integrity and validation for catalog tables (profiles, transaction types, categories, etc.)
+- Password hashes never exposed in API responses
 
 ## 📦 Installation
 ```
-git clone https://yourrepo.git
+git clone https://github.com/Thesharingan312/Sql_CA.git
 cd moneyshield
 npm install
 ```
@@ -56,11 +58,11 @@ Use this interface to explore, test, and understand all available endpoints in r
 
 ## 🧾 API Endpoints
 **Users**
--`GET /users` - List all users
--`GET /users/{id}` - Get user by ID
--`POST /users` - Create a new user
-- `PUT /users/{id}` - Update a user fully
-- `PATCH /users/{id}` - Update a user partially
+- `GET /users` - List all users (without password)
+- `GET /users/{id}` - Get user by ID
+- `POST /users` - Create a new user (requires: first_name, last_name, email, password_hash, profile_id; optional: base_budget, base_saving)
+- `PUT /users/{id}` -  Fully update a user (all fields required)
+- `PATCH /users/{id}` - Partially update a user (any field)
 - `DELETE /users/{id}` - Delete a user
 
 **Transactions**
@@ -76,20 +78,27 @@ Use this interface to explore, test, and understand all available endpoints in r
 
 ```
 src/
-    db/DBHelper.js
-    users/
-        user.controller.js
-        user.service.js
-        user.dao.js
-    transactions/
-        transaction.controller.js
-        transaction.service.js
-        transaction.dao.js
+    db/DBHelper.mjs
+    modules/
+        users/
+            user.controller.mjs
+            user.service.mjs
+            user.dao.mjs
+        transactions/
+            transaction.controller.mjs
+            transaction.service.mjs
+            transaction.dao.mjs
+            ...
     index.mjs
 .env
 package.json
 README.md
 ```
+## 🛡️ Security
+
+- Password hashes are never returned by the API.
+- Referential integrity is enforced at the database level.
+- Input validation and error handling on all endpoints.
 
 
 ## 🤝 Contributing
@@ -110,4 +119,4 @@ Sigue las instrucciones anteriores para instalar, configurar y ejecutar el proye
 ---
 
 Created for MoneyShield © 2025
-Current date: Thursday, May 08, 2025, 5:20 PM CEST
+Current date: Tuesday, May 13, 2025, 3:40 PM
