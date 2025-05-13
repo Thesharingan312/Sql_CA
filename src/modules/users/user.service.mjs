@@ -1,39 +1,55 @@
 // src/modules/users/user.service.mjs
-
 import * as userDao from './user.dao.mjs';
+
+/**
+ * Filtra campos sensibles de usuario
+ */
+function omitPassword(user) {
+  if (!user) return null;
+  const { password_hash, ...rest } = user;
+  return rest;
+}
 
 /**
  * Obtener todos los usuarios | Get all users
  */
 export async function getAllUsers() {
-  // Aquí podrías agregar lógica de negocio extra si lo necesitas
-  return await userDao.getAllUsers();
+  const users = await userDao.getAllUsers();
+  return users.map(omitPassword);
 }
 
 /**
  * Obtener usuario por ID | Get user by ID
  */
 export async function getUserById(id) {
-  // Validación básica: ID debe ser un número positivo
   if (!id || isNaN(id) || id <= 0) {
     throw new Error('Invalid user ID');
   }
-  return await userDao.getUserById(id);
+  const user = await userDao.getUserById(id);
+  return omitPassword(user);
 }
 
 /**
  * Crear un nuevo usuario | Create a new user
  */
 export async function createUser(userData) {
-  // Validación básica de campos obligatorios
   const requiredFields = ['first_name', 'last_name', 'email', 'password_hash', 'profile_id'];
   for (const field of requiredFields) {
     if (!userData[field]) {
       throw new Error(`Missing required field: ${field}`);
     }
   }
-  // Aquí podrías agregar lógica de negocio adicional (por ejemplo, verificar email único)
-  return await userDao.createUser(userData);
+  // Validar unicidad de email
+  const existing = await userDao.getUserByEmail(userData.email);
+  if (existing) throw new Error('Email already exists');
+  // Validar que el profile_id existe
+  const profileOk = await userDao.profileExists(userData.profile_id);
+  if (!profileOk) throw new Error('Profile does not exist');
+  // Valores por defecto
+  if (userData.base_budget === undefined) userData.base_budget = 0;
+  if (userData.base_saving === undefined) userData.base_saving = 0;
+  const user = await userDao.createUser(userData);
+  return omitPassword(user);
 }
 
 /**
@@ -43,13 +59,21 @@ export async function editUser(id, userData) {
   if (!id || isNaN(id) || id <= 0) {
     throw new Error('Invalid user ID');
   }
-  // Validación básica de campos obligatorios para PUT
   const requiredFields = ['first_name', 'last_name', 'email', 'password_hash', 'profile_id'];
   for (const field of requiredFields) {
     if (!userData[field]) {
       throw new Error(`Missing required field: ${field}`);
     }
   }
+  // Validar unicidad de email (si se cambia)
+  const existing = await userDao.getUserByEmail(userData.email);
+  if (existing && existing.id != id) throw new Error('Email already exists');
+  // Validar que el profile_id existe
+  const profileOk = await userDao.profileExists(userData.profile_id);
+  if (!profileOk) throw new Error('Profile does not exist');
+  // Valores por defecto
+  if (userData.base_budget === undefined) userData.base_budget = 0;
+  if (userData.base_saving === undefined) userData.base_saving = 0;
   return await userDao.updateUser(id, userData);
 }
 
@@ -60,9 +84,18 @@ export async function patchUser(id, fields) {
   if (!id || isNaN(id) || id <= 0) {
     throw new Error('Invalid user ID');
   }
-  // Validar que al menos un campo venga para actualizar
   if (!fields || Object.keys(fields).length === 0) {
     throw new Error('No fields to update');
+  }
+  // Validar unicidad de email (si se cambia)
+  if (fields.email) {
+    const existing = await userDao.getUserByEmail(fields.email);
+    if (existing && existing.id != id) throw new Error('Email already exists');
+  }
+  // Validar profile_id (si se cambia)
+  if (fields.profile_id) {
+    const profileOk = await userDao.profileExists(fields.profile_id);
+    if (!profileOk) throw new Error('Profile does not exist');
   }
   return await userDao.patchUser(id, fields);
 }

@@ -1,5 +1,4 @@
 // src/modules/users/user.dao.mjs
-
 import db from '../../db/DBHelper.mjs';
 
 /**
@@ -19,26 +18,40 @@ export async function getUserById(id) {
 }
 
 /**
+ * Obtener usuario por email | Get user by email
+ */
+export async function getUserByEmail(email) {
+  const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+  return rows[0];
+}
+
+/**
+ * Verificar existencia de profile_id | Check if profile exists
+ */
+export async function profileExists(profile_id) {
+  const [rows] = await db.query('SELECT id FROM profiles WHERE id = ?', [profile_id]);
+  return rows.length > 0;
+}
+
+/**
  * Crear un nuevo usuario | Create a new user
  */
-export async function createUser({ first_name, last_name, email, password_hash, profile_id }) {
+export async function createUser({ first_name, last_name, email, password_hash, profile_id, base_budget = 0, base_saving = 0 }) {
   const [result] = await db.query(
-    'INSERT INTO users (first_name, last_name, email, password_hash, profile_id) VALUES (?, ?, ?, ?, ?)',
-    [first_name, last_name, email, password_hash, profile_id || null]
+    'INSERT INTO users (first_name, last_name, email, password_hash, profile_id, base_budget, base_saving) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    [first_name, last_name, email, password_hash, profile_id, base_budget, base_saving]
   );
-  // Devuelve el usuario creado (sin password) | Return created user (without password)
-  return { id: result.insertId, first_name, last_name, email, profile_id };
+  return { id: result.insertId, first_name, last_name, email, profile_id, base_budget, base_saving };
 }
 
 /**
  * Actualizar completamente un usuario | Fully update a user
  */
-export async function updateUser(id, { first_name, last_name, email, password_hash, profile_id }) {
+export async function updateUser(id, { first_name, last_name, email, password_hash, profile_id, base_budget = 0, base_saving = 0 }) {
   const [result] = await db.query(
-    'UPDATE users SET first_name = ?, last_name = ?, email = ?, password_hash = ?, profile_id = ? WHERE id = ?',
-    [first_name, last_name, email, password_hash, profile_id || null, id]
+    'UPDATE users SET first_name = ?, last_name = ?, email = ?, password_hash = ?, profile_id = ?, base_budget = ?, base_saving = ? WHERE id = ?',
+    [first_name, last_name, email, password_hash, profile_id, base_budget, base_saving, id]
   );
-  // Devuelve true si se actualizó algún registro | Returns true if any record was updated
   return result.affectedRows > 0;
 }
 

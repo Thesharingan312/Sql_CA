@@ -1,5 +1,4 @@
 // src/modules/users/user.controller.mjs
-
 import express from 'express';
 import * as userService from './user.service.mjs';
 
@@ -88,6 +87,12 @@ router.get('/:id', async (req, res) => {
  *                 type: string
  *               profile_id:
  *                 type: integer
+ *               base_budget:
+ *                 type: number
+ *                 default: 0
+ *               base_saving:
+ *                 type: number
+ *                 default: 0
  *     responses:
  *       201:
  *         description: User created | Usuario creado
@@ -99,7 +104,7 @@ router.post('/', async (req, res) => {
     const user = await userService.createUser(req.body);
     res.status(201).json(user);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(400).json({ error: err.message });
   }
 });
 
@@ -138,6 +143,10 @@ router.post('/', async (req, res) => {
  *                 type: string
  *               profile_id:
  *                 type: integer
+ *               base_budget:
+ *                 type: number
+ *               base_saving:
+ *                 type: number
  *     responses:
  *       200:
  *         description: User updated | Usuario actualizado
@@ -150,7 +159,7 @@ router.put('/:id', async (req, res) => {
     if (!updated) return res.status(404).json({ error: 'User not found' });
     res.json({ message: 'User updated' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(400).json({ error: err.message });
   }
 });
 
@@ -183,6 +192,10 @@ router.put('/:id', async (req, res) => {
  *                 type: string
  *               profile_id:
  *                 type: integer
+ *               base_budget:
+ *                 type: number
+ *               base_saving:
+ *                 type: number
  *     responses:
  *       200:
  *         description: User partially updated | Usuario parcialmente actualizado
@@ -195,7 +208,7 @@ router.patch('/:id', async (req, res) => {
     if (!updated) return res.status(404).json({ error: 'User not found or no fields to update' });
     res.json({ message: 'User patched' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(400).json({ error: err.message });
   }
 });
 
