@@ -134,6 +134,8 @@ app.get('/users/:id', (req, res) => {
  *               - email
  *               - password_hash
  *               - profile_id
+ *               - base_budget
+ *               - base_saving   
  *     responses:
  *       200:
  *         description: User created successfully
@@ -144,17 +146,31 @@ app.get('/users/:id', (req, res) => {
  */
 // Create a new user (CREATE) | Crear un nuevo usuario (CREAR)
 app.post('/users', (req, res) => {
-    const { first_name, last_name, email, password_hash, profile_id } = req.body;
-    if (!first_name || !email || !password_hash || !profile_id) {
-        return res.status(400).json({ error: 'Missing required fields (first_name, email, password_hash, profile_id)' });
+    const { first_name, last_name, email, password_hash, profile_id, base_budget, base_saving } = req.body;
+
+    // Validación completa
+    if (!first_name || !email || !password_hash || !profile_id || !base_budget || !base_saving) {
+        return res.status(400).json({ 
+            error: 'Missing required fields (first_name, email, password_hash, profile_id, base_budget, base_saving)' 
+        });
     }
+
+    // Query with the 7 expected fields // Consulta con los 7 campos esperados
     db.query(
-    'INSERT INTO users (first_name, last_name, email, password_hash, profile_id) VALUES (?, ?, ?, ?, ?)',
-    [first_name, last_name || null, email, password_hash, profile_id],
-    (err, result) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json({ id: result.insertId, first_name, last_name, email, profile_id });
-    }
+        'INSERT INTO users (first_name, last_name, email, password_hash, profile_id, base_budget, base_saving) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [first_name, last_name || null, email, password_hash, profile_id, base_budget, base_saving],
+        (err, result) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ 
+                id: result.insertId, 
+                first_name, 
+                last_name, 
+                email, 
+                profile_id,
+                base_budget,
+                base_saving
+            });
+        }
     );
 });
 
