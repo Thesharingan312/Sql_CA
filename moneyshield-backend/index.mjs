@@ -1,10 +1,14 @@
 // Import required libraries | Importar bibliotecas necesarias
 import express from 'express';
+import setupSwagger from './Swagger_doc/swagger.mjs'; // Importa Swagger desde la nueva ruta y extensión
 import mysql from 'mysql2';
 
 // Create the Express application | Crear la aplicación Express
 const app = express();
 app.use(express.json()); // Allows receiving and processing JSON data | Permite recibir y procesar datos JSON
+
+// Set up Swagger documentation | Configurar la documentación de Swagger
+setupSwagger(app);
 
 /**
  * MySQL database connection configuration
@@ -1989,4 +1993,5 @@ app.get('/reports/saving-goals', (req, res) => {
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Server listening at http://localhost:${PORT}`);
+    console.log(`Swagger docs en http://localhost:${PORT}/api-docs`); // <--- Muestra la URL de Swagger
 });
