@@ -46,6 +46,20 @@ npm start
 
 The server will run at [http://localhost:3000](http://localhost:3000).
 
+## 🧪 Running Tests
+
+To run all automated tests (users, transactions, etc.):
+
+```
+npm test
+```
+
+To run only the users tests:
+
+```
+npm test -- tests/users.test.js
+```
+
 ## 📖 API Documentation
 
 Interactive API documentation is available at:
@@ -88,11 +102,14 @@ src/
             transaction.controller.mjs
             transaction.service.mjs
             transaction.dao.mjs
-            ...
+            
     index.mjs
 .env
 package.json
 README.md
+/tests
+  users.test.js
+  transactions.test.js
 ```
 ## 🛡️ Security
 
@@ -119,4 +136,4 @@ Sigue las instrucciones anteriores para instalar, configurar y ejecutar el proye
 ---
 
 Created for MoneyShield © 2025
-Current date: Tuesday, May 13, 2025, 3:40 PM
+Current date: Tuesday, May 14, 2025, 3:40 PM
