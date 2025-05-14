@@ -17,13 +17,30 @@ const router = express.Router();
  * /transactions:
  *   get:
  *     tags: [Transactions]
- *     summary: Get all transactions (optionally filtered by user) | Obtener todas las transacciones (opcionalmente filtradas por usuario)
+ *     summary: Get all transactions (optionally filtered) | Obtener todas las transacciones (opcionalmente filtradas)
  *     parameters:
  *       - in: query
  *         name: user_id
  *         schema:
  *           type: integer
  *         description: Filter by user ID | Filtrar por ID de usuario
+ *       - in: query
+ *         name: type_id
+ *         schema:
+ *           type: integer
+ *         description: Filter by type ID | Filtrar por ID de tipo
+ *       - in: query
+ *         name: from
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *         description: Start date (inclusive) | Fecha de inicio (inclusiva)
+ *       - in: query
+ *         name: to
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *         description: End date (inclusive) | Fecha de fin (inclusiva)
  *     responses:
  *       200:
  *         description: List of transactions | Lista de transacciones
@@ -33,7 +50,7 @@ router.get('/', async (req, res) => {
     const transactions = await transactionService.getAllTransactions(req.query);
     res.json(transactions);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(err.status || 500).json({ error: err.message });
   }
 });
 
@@ -58,10 +75,9 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const transaction = await transactionService.getTransactionById(req.params.id);
-    if (!transaction) return res.status(404).json({ error: 'Transaction not found' });
     res.json(transaction);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(err.status || 500).json({ error: err.message });
   }
 });
 
@@ -79,14 +95,13 @@ router.get('/:id', async (req, res) => {
  *             type: object
  *             required:
  *               - user_id
- *               - type
+ *               - type_id
  *               - amount
  *             properties:
  *               user_id:
  *                 type: integer
- *               type:
- *                 type: string
- *                 enum: [income, expense]
+ *               type_id:
+ *                 type: integer
  *               amount:
  *                 type: number
  *                 format: float
@@ -105,7 +120,7 @@ router.post('/', async (req, res) => {
     const transaction = await transactionService.createTransaction(req.body);
     res.status(201).json(transaction);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(err.status || 500).json({ error: err.message });
   }
 });
 
@@ -130,9 +145,8 @@ router.post('/', async (req, res) => {
  *             properties:
  *               user_id:
  *                 type: integer
- *               type:
- *                 type: string
- *                 enum: [income, expense]
+ *               type_id:
+ *                 type: integer
  *               amount:
  *                 type: number
  *                 format: float
@@ -143,16 +157,17 @@ router.post('/', async (req, res) => {
  *     responses:
  *       200:
  *         description: Transaction updated | Transacción actualizada
+ *       400:
+ *         description: Invalid request | Solicitud inválida
  *       404:
  *         description: Transaction not found | Transacción no encontrada
  */
 router.put('/:id', async (req, res) => {
   try {
-    const updated = await transactionService.updateTransaction(req.params.id, req.body);
-    if (!updated) return res.status(404).json({ error: 'Transaction not found' });
+    await transactionService.updateTransaction(req.params.id, req.body);
     res.json({ message: 'Transaction updated' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(err.status || 500).json({ error: err.message });
   }
 });
 
@@ -176,9 +191,8 @@ router.put('/:id', async (req, res) => {
  *             properties:
  *               user_id:
  *                 type: integer
- *               type:
- *                 type: string
- *                 enum: [income, expense]
+ *               type_id:
+ *                 type: integer
  *               amount:
  *                 type: number
  *                 format: float
@@ -189,16 +203,17 @@ router.put('/:id', async (req, res) => {
  *     responses:
  *       200:
  *         description: Transaction partially updated | Transacción parcialmente actualizada
+ *       400:
+ *         description: Invalid request | Solicitud inválida
  *       404:
  *         description: Transaction not found | Transacción no encontrada
  */
 router.patch('/:id', async (req, res) => {
   try {
-    const updated = await transactionService.updateTransaction(req.params.id, req.body);
-    if (!updated) return res.status(404).json({ error: 'Transaction not found or no fields to update' });
+    await transactionService.updateTransaction(req.params.id, req.body);
     res.json({ message: 'Transaction patched' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(err.status || 500).json({ error: err.message });
   }
 });
 
@@ -222,11 +237,10 @@ router.patch('/:id', async (req, res) => {
  */
 router.delete('/:id', async (req, res) => {
   try {
-    const deleted = await transactionService.deleteTransaction(req.params.id);
-    if (!deleted) return res.status(404).json({ error: 'Transaction not found' });
+    await transactionService.deleteTransaction(req.params.id);
     res.json({ message: 'Transaction deleted' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(err.status || 500).json({ error: err.message });
   }
 });
 
