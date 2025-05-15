@@ -1,6 +1,8 @@
 // src/modules/transactions/transaction.service.mjs
 
 import * as transactionDao from './transaction.dao.mjs';
+// CAMBIO: Importar la conexión a la base de datos directamente
+import db from '../../db/DBHelper.mjs';
 
 /**
  * Validar que amount sea un número positivo
@@ -50,6 +52,23 @@ export async function createTransaction(data) {
       throw error;
     }
   }
+
+  // CAMBIO: Usar la conexión db directamente para buscar el id de "Others"
+  // Si no se envía category_id, buscar el id de "Others"
+  // If category_id is not sent, look for the "Others" category id
+  if (!('category_id' in data) || data.category_id === null || data.category_id === undefined) {
+    const [rows] = await db.query(
+      'SELECT id FROM categories WHERE name = ? LIMIT 1',
+      ['Others']
+    );
+    if (!rows.length) {
+      const error = new Error('Default category "Others" not found');
+      error.status = 500;
+      throw error;
+    }
+    data.category_id = rows[0].id;
+  }
+
   // Validar existencia de user_id y type_id
   const userOk = await transactionDao.userExists(data.user_id);
   if (!userOk) {
@@ -60,6 +79,13 @@ export async function createTransaction(data) {
   const typeOk = await transactionDao.typeExists(data.type_id);
   if (!typeOk) {
     const error = new Error('Transaction type does not exist');
+    error.status = 400;
+    throw error;
+  }
+  // Validar existencia de category_id (ya sea el enviado o el de Others)
+  const categoryOk = await transactionDao.categoryExists(data.category_id);
+  if (!categoryOk) {
+    const error = new Error('Category does not exist');
     error.status = 400;
     throw error;
   }
@@ -100,6 +126,15 @@ export async function updateTransaction(id, fields) {
     const typeOk = await transactionDao.typeExists(fields.type_id);
     if (!typeOk) {
       const error = new Error('Transaction type does not exist');
+      error.status = 400;
+      throw error;
+    }
+  }
+  // Validar existencia de category_id si se envía
+  if ('category_id' in fields && fields.category_id !== null && fields.category_id !== undefined) {
+    const categoryOk = await transactionDao.categoryExists(fields.category_id);
+    if (!categoryOk) {
+      const error = new Error('Category does not exist');
       error.status = 400;
       throw error;
     }

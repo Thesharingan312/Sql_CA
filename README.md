@@ -87,6 +87,21 @@ Use this interface to explore, test, and understand all available endpoints in r
 - `PATCH /transactions/{id}` - Update a transaction partially
 - `DELETE /transactions/{id}` - Delete a transaction
 
+## 🟢 Default Category Assignment in Transactions / Asignación automática de categoría por defecto
+
+- If you create a transaction without specifying the category_id field, the system will automatically assign the "Others" category (by searching for its real id in the database).
+
+- IMPORTANT: The "Others" category must exist in the categories table for the backend to work correctly.
+
+- If "Others" does not exist, creating transactions without a category will fail with a 500 error.
+
+Español:
+
+- Si creas una transacción sin especificar el campo category_id, el sistema asignará automáticamente la categoría "Others" (buscando su id real en la base de datos).
+
+- IMPORTANTE: La categoría "Others" debe existir en la tabla categories para que el backend funcione correctamente.
+
+- Si "Others" no existe, la creación de transacciones sin categoría fallará con error 500.
 
 ## 🗂️ Project Structure
 
@@ -136,4 +151,4 @@ Sigue las instrucciones anteriores para instalar, configurar y ejecutar el proye
 ---
 
 Created for MoneyShield © 2025
-Current date: Tuesday, May 14, 2025, 3:40 PM
+Current date: Thursday, May 15, 2025, 1:20 PM

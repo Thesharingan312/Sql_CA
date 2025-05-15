@@ -102,11 +102,12 @@ router.get('/:id', async (req, res) => {
  *                 type: integer
  *               type_id:
  *                 type: integer
+ *               category_id:
+ *                 type: integer
+ *                 description: Category ID (optional) | ID de categoría (opcional)
  *               amount:
  *                 type: number
  *                 format: float
- *               category:
- *                 type: string
  *               description:
  *                 type: string
  *     responses:
@@ -117,6 +118,8 @@ router.get('/:id', async (req, res) => {
  */
 router.post('/', async (req, res) => {
   try {
+    // Nota: Si no se envía category_id, el service asignará automáticamente la categoría "Others"
+    // Note: If category_id is not sent, the service will automatically assign the "Others" category
     const transaction = await transactionService.createTransaction(req.body);
     res.status(201).json(transaction);
   } catch (err) {
@@ -147,11 +150,12 @@ router.post('/', async (req, res) => {
  *                 type: integer
  *               type_id:
  *                 type: integer
+ *               category_id:
+ *                 type: integer
+ *                 description: Category ID (optional) | ID de categoría (opcional)
  *               amount:
  *                 type: number
  *                 format: float
- *               category:
- *                 type: string
  *               description:
  *                 type: string
  *     responses:
@@ -193,11 +197,12 @@ router.put('/:id', async (req, res) => {
  *                 type: integer
  *               type_id:
  *                 type: integer
+ *               category_id:
+ *                 type: integer
+ *                 description: Category ID (optional) | ID de categoría (opcional)
  *               amount:
  *                 type: number
  *                 format: float
- *               category:
- *                 type: string
  *               description:
  *                 type: string
  *     responses:
