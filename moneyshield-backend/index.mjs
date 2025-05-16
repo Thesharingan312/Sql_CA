@@ -200,8 +200,9 @@ app.post('/users', (req, res) => {
  */
 // Update an existing user (UPDATE) | Actualizar un usuario existente (ACTUALIZAR)
 app.put('/users/:id', (req, res) => {
-    const { first_name, last_name, email, password_hash, profile_id } = req.body;
+    const { first_name, last_name, email, password_hash, profile_id, base_budget, base_saving } = req.body;
     const { id } = req.params;
+
     let fields = [];
     let values = [];
 
@@ -210,19 +211,23 @@ app.put('/users/:id', (req, res) => {
     if (email !== undefined) { fields.push('email = ?'); values.push(email); }
     if (password_hash !== undefined) { fields.push('password_hash = ?'); values.push(password_hash); }
     if (profile_id !== undefined) { fields.push('profile_id = ?'); values.push(profile_id); }
+    if (base_budget !== undefined) { fields.push('base_budget = ?'); values.push(base_budget); }
+    if (base_saving !== undefined) { fields.push('base_saving = ?'); values.push(base_saving); }
 
     if (fields.length === 0) {
-        return res.status(400).json({ error: 'No fields to update were sent' });
+        return res.status(400).json({ 
+            error: 'No fields to update were provided. Expected at least one of: first_name, last_name, email, password_hash, profile_id, base_budget, base_saving' 
+        });
     }
 
     values.push(id);
     db.query(
-    `UPDATE users SET ${fields.join(', ')} WHERE id = ?`,
-    values,
-    (err, result) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json({ message: 'User updated' });
-    }
+        `UPDATE users SET ${fields.join(', ')} WHERE id = ?`,
+        values,
+        (err, result) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ message: 'User updated successfully' });
+        }
     );
 });
 
@@ -346,25 +351,25 @@ app.get('/transactions/:id', (req, res) => {
  */
 // Create a new transaction (CREATE) | Crear una nueva transacción (CREAR)
 app.post('/transactions', (req, res) => {
-    const { user_id, amount, type, category_id, description, date } = req.body;
+    const { user_id, amount, type_id, category_id, description, date } = req.body;
 
   // Validate required fields | Validar campos requeridos
-    if (!user_id || !amount || !type || !category_id || !date) {
+    if (!user_id || !amount || !type_id || !category_id || !date) {
     return res.status(400).json({ 
-        error: 'Missing required fields (user_id, amount, type, category_id, date)' 
+        error: 'Missing required fields (user_id, amount, type_id, category_id, date)' 
     });
     }
 
     db.query(
-    'INSERT INTO transactions (user_id, amount, type, category_id, description, date) VALUES (?, ?, ?, ?, ?, ?)',
-    [user_id, amount, type, category_id, description || null, date],
+    'INSERT INTO transactions (user_id, amount, type_id, category_id, description, date) VALUES (?, ?, ?, ?, ?, ?)',
+    [user_id, amount, type_id, category_id, description || null, date],
     (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ 
         id: result.insertId, 
         user_id, 
         amount, 
-        type, 
+        type_id, 
         category_id, 
         description, 
         date 
@@ -399,7 +404,7 @@ app.post('/transactions', (req, res) => {
  */
 // Update an existing transaction (UPDATE) | Actualizar una transacción existente (ACTUALIZAR)
 app.put('/transactions/:id', (req, res) => {
-    const { user_id, amount, type, category_id, description, date } = req.body;
+    const { user_id, amount, type_id, category_id, description, date } = req.body;
     const { id } = req.params;
     
     let fields = [];
@@ -407,7 +412,7 @@ app.put('/transactions/:id', (req, res) => {
 
     if (user_id !== undefined) { fields.push('user_id = ?'); values.push(user_id); }
     if (amount !== undefined) { fields.push('amount = ?'); values.push(amount); }
-    if (type !== undefined) { fields.push('type = ?'); values.push(type); }
+    if (type_id !== undefined) { fields.push('type_id = ?'); values.push(type_id); }
     if (category_id !== undefined) { fields.push('category_id = ?'); values.push(category_id); }
     if (description !== undefined) { fields.push('description = ?'); values.push(description); }
     if (date !== undefined) { fields.push('date = ?'); values.push(date); }
