@@ -166,7 +166,7 @@ router.post('/', async (req, res) => {
  */
 router.put('/:id', async (req, res) => {
     try {
-    const updated = await profileService.updateProfile(req.params.id, req.body);
+    await profileService.updateProfile(req.params.id, req.body);
     res.json({ message: 'Profile updated' });
     } catch (err) {
     res.status(err.status || 500).json({ error: err.message });

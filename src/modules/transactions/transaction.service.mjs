@@ -1,8 +1,6 @@
 // src/modules/transactions/transaction.service.mjs
 
 import * as transactionDao from './transaction.dao.mjs';
-// CAMBIO: Importar la conexión a la base de datos directamente
-import db from '../../db/DBHelper.mjs';
 
 /**
  * Validar que amount sea un número positivo
@@ -113,6 +111,7 @@ export async function updateTransaction(id, fields) {
     error.status = 400;
     throw error;
   }
+
   // Validar existencia de user_id y type_id si se envían
   if (fields.user_id) {
     const userOk = await transactionDao.userExists(fields.user_id);

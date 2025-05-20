@@ -31,7 +31,7 @@ export async function getProfileById(id) {
  *  Crear un nuevo perfil | Create a new profile
  */
 export async function createProfile(profileData) {
-    if (!profileData || !profileData.name || profileData.name.trim() === '') {
+    if (!profileData?.name?.trim()) {
     const error = new Error('Profile name is required');
     error.status = 400;
     throw error;
@@ -56,7 +56,8 @@ export async function updateProfile(id, profileData) {
     error.status = 400;
     throw error;
     }
-    if (!profileData || !profileData.name || profileData.name.trim() === '') {
+    // Aplicar sugerencia de SonarQube con optional chaining
+    if (!profileData?.name?.trim()) {
     const error = new Error('Profile name is required');
     error.status = 400;
     throw error;
