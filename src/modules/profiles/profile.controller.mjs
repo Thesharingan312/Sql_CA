@@ -8,32 +8,32 @@ const router = express.Router();
 /**
  *  @swagger
  *  tags:
- *  name: Profiles
- *  description: Profile management | Gestión de perfiles
+ *      name: Profiles
+ *      description: Profile management | Gestión de perfiles
  */
 
 /**
  *  @swagger
  *  /profiles:
- *  get:
- *  tags: [Profiles]
- *  summary: Get all profiles | Obtener todos los perfiles
- *  responses:
- *  200:
- *  description: List of profiles | Lista de perfiles
- *  content:
- *  application/json:
- *  schema:
- *  type: array
- *  items:
- *  type: object
- *  properties:
- *  id:
- *  type: integer
- *  name:
- *  type: string
- *  500:
- *  description: Server error | Error del servidor
+ *   get:
+ *     tags: [Profiles]
+ *     summary: Get all profiles | Obtener todos los perfiles
+ *     responses:
+ *       200:
+ *         description: List of profiles | Lista de perfiles
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   name:
+ *                     type: string
+ *       500:
+ *         description: Server error | Error del servidor
  */
 router.get('/', async (req, res) => {
     try {
@@ -47,33 +47,33 @@ router.get('/', async (req, res) => {
 /**
  *  @swagger
  *  /profiles/{id}:
- *  get:
- *  tags: [Profiles]
- *  summary: Get profile by ID | Obtener perfil por ID
- *  parameters:
- *  - in: path
- *  name: id
- *  required: true
- *  schema:
- *  type: integer
- *  responses:
- *  200:
- *  description: Profile found | Perfil encontrado
- *  content:
- *  application/json:
- *  schema:
- *  type: object
- *  properties:
- *  id:
- *  type: integer
- *  name:
- *  type: string
- *  400:
- *  description: Invalid ID | ID inválido
- *  404:
- *  description: Profile not found | Perfil no encontrado
- *  500:
- *  description: Server error | Error del servidor
+ *   get:
+ *     tags: [Profiles]
+ *     summary: Get profile by ID | Obtener perfil por ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Profile found | Perfil encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 name:
+ *                   type: string
+ *       400:
+ *         description: Invalid ID | ID inválido
+ *       404:
+ *         description: Profile not found | Perfil no encontrado
+ *       500:
+ *         description: Server error | Error del servidor
  */
 router.get('/:id', async (req, res) => {
     try {
@@ -87,38 +87,38 @@ router.get('/:id', async (req, res) => {
 /**
  *  @swagger
  *  /profiles:
- *  post:
- *  tags: [Profiles]
- *  summary: Create a new profile | Crear un nuevo perfil
- *  requestBody:
- *  required: true
- *  content:
- *  application/json:
- *  schema:
- *  type: object
- *  required:
- *  - name
- *  properties:
- *  name:
- *  type: string
- *  responses:
- *  201:
- *  description: Profile created | Perfil creado
- *  content:
- *  application/json:
- *  schema:
- *  type: object
- *  properties:
- *  id:
- *  type: integer
- *  name:
- *  type: string
- *  400:
- *  description: Invalid input | Entrada inválida
- *  409:
- *  description: Profile name already exists | El nombre del perfil ya existe
- *  500:
- *  description: Server error | Error del servidor
+ *   post:
+ *     tags: [Profiles]
+ *     summary: Create a new profile | Crear un nuevo perfil
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *             properties:
+ *               name:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Profile created | Perfil creado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 name:
+ *                   type: string
+ *       400:
+ *         description: Invalid input | Entrada inválida
+ *       409:
+ *         description: Profile name already exists | El nombre del perfil ya existe
+ *       500:
+ *         description: Server error | Error del servidor
  */
 router.post('/', async (req, res) => {
     try {
@@ -130,39 +130,39 @@ router.post('/', async (req, res) => {
 });
 
 /**
- *  @swagger
- *  /profiles/{id}:
- *  put:
- *  tags: [Profiles]
- *  summary: Update an existing profile | Actualizar un perfil existente
- *  parameters:
- *  - in: path
- *  name: id
- *  required: true
- *  schema:
- *  type: integer
- *  requestBody:
- *  required: true
- *  content:
- *  application/json:
- *  schema:
- *  type: object
- *  required:
- *  - name
- *  properties:
- *  name:
- *  type: string
- *  responses:
- *  200:
- *  description: Profile updated | Perfil actualizado
- *  400:
- *  description: Invalid input | Entrada inválida
- *  404:
- *  description: Profile not found | Perfil no encontrado
- *  409:
- *  description: Profile name already exists | El nombre del perfil ya existe
- *  500:
- *  description: Server error | Error del servidor
+ * @swagger
+ * /profiles/{id}:
+ *   put:
+ *     tags: [Profiles]
+ *     summary: Update an existing profile | Actualizar un perfil existente
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *             properties:
+ *               name:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Profile updated | Perfil actualizado
+ *       400:
+ *         description: Invalid input | Entrada inválida
+ *       404:
+ *         description: Profile not found | Perfil no encontrado
+ *       409:
+ *         description: Profile name already exists | El nombre del perfil ya existe
+ *       500:
+ *         description: Server error | Error del servidor
  */
 router.put('/:id', async (req, res) => {
     try {
@@ -176,26 +176,26 @@ router.put('/:id', async (req, res) => {
 /**
  *  @swagger
  *  /profiles/{id}:
- *  delete:
- *  tags: [Profiles]
- *  summary: Delete a profile | Eliminar un perfil
- *  parameters:
- *  - in: path
- *  name: id
- *  required: true
- *  schema:
- *  type: integer
- *  responses:
- *  200:
- *  description: Profile deleted | Perfil eliminado
- *  400:
- *  description: Invalid ID | ID inválido
- *  404:
- *  description: Profile not found | Perfil no encontrado
- *  409:
- *  description: Conflict, e.g., associated users exist | Conflicto, ej. existen usuarios asociados
- *  500:
- *  description: Server error | Error del servidor
+ *   delete:
+ *     tags: [Profiles]
+ *     summary: Delete a profile | Eliminar un perfil
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Profile deleted | Perfil eliminado
+ *       400:
+ *         description: Invalid ID | ID inválido
+ *       404:
+ *         description: Profile not found | Perfil no encontrado
+ *       409:
+ *         description: Conflict, e.g., associated users exist | Conflicto, ej. existen usuarios asociados
+ *       500:
+ *         description: Server error | Error del servidor
  */
 router.delete('/:id', async (req, res) => {
     try {

@@ -99,13 +99,13 @@ export async function deleteProfile(id) {
     throw error;
     }
 
-    // Opcional: Podrías añadir una verificación aquí si hay usuarios asociados a este perfil
-    // const usersWithProfile = await userDao.getUsersByProfileId(id);
-    // if (usersWithProfile.length > 0) {
-    //   const error = new Error('Cannot delete profile: associated users exist');
-    //   error.status = 409;
-    //   throw error;
-    // }
+    // Verificar si el perfil existe
+    const usersWithProfile = await userDao.getUsersByProfileId(id);
+    if (usersWithProfile.length > 0) {
+    const error = new Error('Cannot delete profile: associated users exist');
+    error.status = 409;
+    throw error;
+    }
 
     const deleted = await profileDao.deleteProfile(id);
     if (!deleted) {

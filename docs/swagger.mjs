@@ -8,7 +8,7 @@ const options = {
     openapi: '3.0.0',
     info: {
       title: 'MoneyShield API',
-      version: '0.1.3',
+      version: '0.1.4',
       description: 'REST API documentation for MoneyShield project',
     },
     servers: [
