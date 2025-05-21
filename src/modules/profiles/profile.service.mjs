@@ -1,6 +1,7 @@
 // src/modules/profiles/profile.service.mjs
 
 import * as profileDao from './profile.dao.mjs';
+import * as userDao from '../users/user.dao.mjs';
 
 /**
  *  Obtener todos los perfiles | Get all profiles

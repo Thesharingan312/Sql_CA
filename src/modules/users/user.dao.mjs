@@ -78,3 +78,11 @@ export async function deleteUser(id) {
   const [result] = await db.query('DELETE FROM users WHERE id = ?', [id]);
   return result.affectedRows > 0;
 }
+
+/**
+ * Obtener usuarios por profile_id | Get users by profile ID
+ */
+export async function getUsersByProfileId(profile_id) {
+  const [rows] = await db.query('SELECT * FROM users WHERE profile_id = ?', [profile_id]);
+  return rows;
+}
