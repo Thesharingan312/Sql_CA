@@ -26,7 +26,7 @@ A RESTful API backend for the MoneyShield financial management application. This
 
 ## Overview
 
-MoneyShield API is a Node.js Express server application that connects to a MySQL database to manage financial data. It implements complete CRUD operations (Create, Read, Update, Delete) for core entities like users, **profiles**, **transaction types**, and **transactions**, providing a comprehensive backend solution for a personal finance management application. Future modules like **categories**, budgets, and savings will further enhance its capabilities.
+MoneyShield API is a Node.js Express server application that connects to a MySQL database to manage financial data. It implements complete CRUD operations (Create, Read, Update, Delete) for core entities like users, **profiles**, **transaction types**, **categories**, and **transactions**, providing a comprehensive backend solution for a personal finance management application. Future modules like budgets and savings will further enhance its capabilities.
 
 ## Requirements
 
@@ -95,9 +95,9 @@ Handles user profiles, which define roles or access levels within the applicatio
 
 Manages predefined types for financial transactions (e.g., 'Income', 'Expense', 'Transfer'). Essential for categorizing transactions.
 
-### Categories (Coming Soon)
+### Categories
 
-Will manage spending and income categories (e.g., 'Groceries', 'Utilities', 'Salary'). These will be assignable to transactions.
+Manages spending and income categories (e.g., 'Groceries', 'Utilities', 'Salary'). These are assignable to transactions.
 
 ### Transactions
 

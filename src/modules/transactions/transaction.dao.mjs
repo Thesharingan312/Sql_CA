@@ -126,3 +126,14 @@ export async function deleteTransaction(id) {
   const [result] = await db.query('DELETE FROM transactions WHERE id = ?', [id]);
   return result.affectedRows > 0;
 }
+/**
+ * Obtener transacciones por ID de categoría
+ * Get transactions by category ID
+ */
+export async function getTransactionsByCategoryId(categoryId) {
+  const [rows] = await db.query(
+    'SELECT id FROM transactions WHERE category_id = ? LIMIT 1',
+    [categoryId]
+  );
+  return rows;
+}
