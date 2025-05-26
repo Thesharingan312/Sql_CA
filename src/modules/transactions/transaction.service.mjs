@@ -1,18 +1,11 @@
 // src/modules/transactions/transaction.service.mjs
 
 import * as transactionDao from './transaction.dao.mjs';
-
-/**
- * Validar que amount sea un número positivo
- * Validate that amount is a positive number
- */
-function isValidAmount(amount) {
-  return typeof amount === 'number' && amount > 0;
-}
+import { isValidId, isValidPositiveNumber, validateRequiredFields } from '../../utils/validation.mjs'; 
+import { ERROR_MESSAGES } from '../../constants/errorMessages.mjs'; 
 
 /**
  * Obtener todas las transacciones con filtros
- * Get all transactions with filters
  */
 export async function getAllTransactions(filter) {
   return await transactionDao.getAllTransactions(filter);
@@ -20,17 +13,12 @@ export async function getAllTransactions(filter) {
 
 /**
  * Obtener una transacción por ID
- * Get a transaction by ID
  */
 export async function getTransactionById(id) {
-  if (!id || isNaN(id) || id <= 0) {
-    const error = new Error('Invalid transaction ID');
-    error.status = 400;
-    throw error;
-  }
+  isValidId(id, 'Transaction ID'); // MODIFICADO
   const transaction = await transactionDao.getTransactionById(id);
   if (!transaction) {
-    const error = new Error('Transaction not found');
+    const error = new Error(ERROR_MESSAGES.TRANSACTION.NOT_FOUND); // MODIFICADO
     error.status = 404;
     throw error;
   }
@@ -39,113 +27,102 @@ export async function getTransactionById(id) {
 
 /**
  * Crear una nueva transacción
- * Create a new transaction
  */
 export async function createTransaction(data) {
-  const requiredFields = ['user_id', 'type_id', 'amount'];
-  for (const field of requiredFields) {
-    if (!data[field]) {
-      const error = new Error(`Missing required field: ${field}`);
-      error.status = 400;
-      throw error;
-    }
-  }
+  const requiredFields = ['user_id', 'type_id', 'amount']; // category_id se maneja especialmente
+  validateRequiredFields(data, requiredFields, 'Transaction'); // MODIFICADO
 
-  // CAMBIO: Usar la conexión db directamente para buscar el id de "Others"
-  // Si no se envía category_id, buscar el id de "Others"
-  // If category_id is not sent, look for the "Others" category id
+  // La validación de category_id permanece aquí debido a la lógica de 'Others'
   if (!('category_id' in data) || data.category_id === null || data.category_id === undefined) {
-    const [rows] = await db.query(
+    // Esta lógica de acceso directo a 'db' podría moverse al DAO de categorías.
+    // Por ahora, se estandariza el mensaje de error.
+    const [rows] = await db.query( // Asegúrate que 'db' esté disponible en este contexto
       'SELECT id FROM categories WHERE name = ? LIMIT 1',
       ['Others']
     );
     if (!rows.length) {
-      const error = new Error('Default category "Others" not found');
-      error.status = 500;
+      const error = new Error(ERROR_MESSAGES.CATEGORY.NOT_FOUND + " (Default 'Others')"); // MODIFICADO 
+      error.status = 500; // aunque podría ser 404/400
       throw error;
     }
     data.category_id = rows[0].id;
   }
+  
+  // Validar IDs de FK antes de usarlos
+  isValidId(data.user_id, 'User ID');
+  isValidId(data.type_id, 'Type ID');
+  isValidId(data.category_id, 'Category ID'); // Validar el ID de categoría sea el enviado o el de "Others"
 
-  // Validar existencia de user_id y type_id
   const userOk = await transactionDao.userExists(data.user_id);
   if (!userOk) {
-    const error = new Error('User does not exist');
+    const error = new Error(ERROR_MESSAGES.FOREIGN_KEY.USER_NOT_EXIST); // MODIFICADO
     error.status = 400;
     throw error;
   }
   const typeOk = await transactionDao.typeExists(data.type_id);
   if (!typeOk) {
-    const error = new Error('Transaction type does not exist');
+    const error = new Error(ERROR_MESSAGES.FOREIGN_KEY.TRANSACTION_TYPE_NOT_EXIST); // MODIFICADO
     error.status = 400;
     throw error;
   }
-  // Validar existencia de category_id (ya sea el enviado o el de Others)
   const categoryOk = await transactionDao.categoryExists(data.category_id);
   if (!categoryOk) {
-    const error = new Error('Category does not exist');
+    const error = new Error(ERROR_MESSAGES.FOREIGN_KEY.CATEGORY_NOT_EXIST); // MODIFICADO
     error.status = 400;
     throw error;
   }
-  // Validar amount positivo
-  if (!isValidAmount(data.amount)) {
-    const error = new Error('Amount must be a positive number');
-    error.status = 400;
-    throw error;
-  }
+
+  isValidPositiveNumber(data.amount, 'Amount'); // MODIFICADO
+
   return await transactionDao.createTransaction(data);
 }
 
 /**
  * Actualizar una transacción existente (PUT o PATCH)
- * Update an existing transaction (PUT or PATCH)
  */
 export async function updateTransaction(id, fields) {
-  if (!id || isNaN(id) || id <= 0) {
-    const error = new Error('Invalid transaction ID');
-    error.status = 400;
-    throw error;
-  }
+  isValidId(id, 'Transaction ID'); // MODIFICADO
+
   if (!fields || Object.keys(fields).length === 0) {
-    const error = new Error('No fields to update');
+    const error = new Error(ERROR_MESSAGES.NO_FIELDS_TO_UPDATE); // MODIFICADO
     error.status = 400;
     throw error;
   }
 
-  // Validar existencia de user_id y type_id si se envían
   if (fields.user_id) {
+    isValidId(fields.user_id, 'User ID'); // MODIFICADO: Validar formato del ID
     const userOk = await transactionDao.userExists(fields.user_id);
     if (!userOk) {
-      const error = new Error('User does not exist');
+      const error = new Error(ERROR_MESSAGES.FOREIGN_KEY.USER_NOT_EXIST); // MODIFICADO
       error.status = 400;
       throw error;
     }
   }
   if (fields.type_id) {
+    isValidId(fields.type_id, 'Type ID'); // MODIFICADO: Validar formato del ID
     const typeOk = await transactionDao.typeExists(fields.type_id);
     if (!typeOk) {
-      const error = new Error('Transaction type does not exist');
+      const error = new Error(ERROR_MESSAGES.FOREIGN_KEY.TRANSACTION_TYPE_NOT_EXIST); // MODIFICADO
       error.status = 400;
       throw error;
     }
   }
-  // Validar existencia de category_id si se envía
   if ('category_id' in fields && fields.category_id !== null && fields.category_id !== undefined) {
+    isValidId(fields.category_id, 'Category ID'); // MODIFICADO: Validar formato del ID
     const categoryOk = await transactionDao.categoryExists(fields.category_id);
     if (!categoryOk) {
-      const error = new Error('Category does not exist');
+      const error = new Error(ERROR_MESSAGES.FOREIGN_KEY.CATEGORY_NOT_EXIST); // MODIFICADO
       error.status = 400;
       throw error;
     }
   }
-  if (fields.amount && !isValidAmount(fields.amount)) {
-    const error = new Error('Amount must be a positive number');
-    error.status = 400;
-    throw error;
+  if (fields.amount) {
+    isValidPositiveNumber(fields.amount, 'Amount'); // MODIFICADO
   }
+
   const updated = await transactionDao.updateTransaction(id, fields);
-  if (!updated) {
-    const error = new Error('Transaction not found');
+  if (!updated) { // Asumiendo que el DAO devuelve null o 0 si no se actualiza/encuentra
+    const error = new Error(ERROR_MESSAGES.TRANSACTION.NOT_FOUND); // MODIFICADO
     error.status = 404;
     throw error;
   }
@@ -154,17 +131,12 @@ export async function updateTransaction(id, fields) {
 
 /**
  * Eliminar una transacción por ID
- * Delete a transaction by ID
  */
 export async function deleteTransaction(id) {
-  if (!id || isNaN(id) || id <= 0) {
-    const error = new Error('Invalid transaction ID');
-    error.status = 400;
-    throw error;
-  }
+  isValidId(id, 'Transaction ID'); // MODIFICADO
   const deleted = await transactionDao.deleteTransaction(id);
-  if (!deleted) {
-    const error = new Error('Transaction not found');
+  if (!deleted) { // Asumiendo que el DAO devuelve null o 0 si no se elimina/encuentra
+    const error = new Error(ERROR_MESSAGES.TRANSACTION.NOT_FOUND); // MODIFICADO
     error.status = 404;
     throw error;
   }

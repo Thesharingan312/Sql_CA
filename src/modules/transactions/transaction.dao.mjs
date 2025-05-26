@@ -126,6 +126,19 @@ export async function deleteTransaction(id) {
   const [result] = await db.query('DELETE FROM transactions WHERE id = ?', [id]);
   return result.affectedRows > 0;
 }
+
+/**
+  * Obtener transacciones por ID de tipo
+  * Get transactions by type ID
+ */
+export async function getTransactionsByTypeId(typeId) {
+  const [rows] = await db.query(
+    'SELECT id FROM transactions WHERE type_id = ?',
+    [typeId]
+  );
+  return rows;
+}
+
 /**
  * Obtener transacciones por ID de categoría
  * Get transactions by category ID

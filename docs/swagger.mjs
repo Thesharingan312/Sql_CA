@@ -17,7 +17,8 @@ const options = {
       },
     ],
   },
-  apis: ['./src/modules/users/*.mjs', './src/modules/transactions/*.mjs', './src/modules/profiles/*.mjs', './src/modules/categories/*.mjs'], 
+  apis: ['./src/modules/users/*.mjs', './src/modules/transactions/*.mjs', './src/modules/profiles/*.mjs', './src/modules/categories/*.mjs',
+  './src/modules/transaction_types/*.mjs'], 
   // Cambia la ruta según la ubicación de tus archivos | Change the path according to the location of your files
 };
 

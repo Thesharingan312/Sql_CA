@@ -1,26 +1,26 @@
-// src/modules/categories/category.controller.mjs
+// src/modules/transaction_types/transaction_type.controller.mjs
 
 import express from 'express';
-import * as categoryService from './category.service.mjs';
+import * as transactionTypeService from './transaction_type.service.mjs';
 
 const router = express.Router();
 
 /**
- *  @swagger
- *  tags:
- *   - name: Categories
- *     description: Management of transaction categories (e.g., food, transport) | Gestión de categorías de transacción (ej. comida, transporte)
+ * @swagger
+ * tags:
+ *   - name: Transaction Types
+ *     description: Management of transaction types (e.g., income, expense, transfer) | Gestión de tipos de transacción (ej. ingreso, gasto, transferencia)
  */
 
 /**
- *  @swagger
- *  /categories:
+ * @swagger
+ * /transaction_types:
  *   get:
- *     tags: [Categories]
- *     summary: Get all categories | Obtener todas las categorías
+ *     tags: [Transaction Types]
+ *     summary: Get all transaction types | Obtener todos los tipos de transacción
  *     responses:
  *       200:
- *         description: List of categories | Lista de categorías
+ *         description: List of transaction types | Lista de tipos de transacción
  *         content:
  *           application/json:
  *             schema:
@@ -37,8 +37,8 @@ const router = express.Router();
  */
 router.get('/', async (req, res) => {
     try {
-        const categories = await categoryService.getAllCategories();
-        res.json(categories);
+        const types = await transactionTypeService.getAllTransactionTypes();
+        res.json(types);
     } 
     catch (err) {
         res.status(err.status || 500).json({ error: err.message });
@@ -46,11 +46,11 @@ router.get('/', async (req, res) => {
 });
 
 /**
- *  @swagger
- *  /categories/{id}:
+ * @swagger
+ * /transaction_types/{id}:
  *   get:
- *     tags: [Categories]
- *     summary: Get category by ID | Obtener categoría por ID
+ *     tags: [Transaction Types]
+ *     summary: Get transaction type by ID | Obtener tipo de transacción por ID
  *     parameters:
  *       - in: path
  *         name: id
@@ -59,7 +59,7 @@ router.get('/', async (req, res) => {
  *           type: integer
  *     responses:
  *       200:
- *         description: Category found | Categoría encontrada
+ *         description: Transaction type found | Tipo de transacción encontrado
  *         content:
  *           application/json:
  *             schema:
@@ -72,26 +72,26 @@ router.get('/', async (req, res) => {
  *       400:
  *         description: Invalid ID | ID inválido
  *       404:
- *         description: Category not found | Categoría no encontrada
+ *         description: Transaction type not found | Tipo de transacción no encontrado
  *       500:
  *         description: Server error | Error del servidor
  */
 router.get('/:id', async (req, res) => {
     try {
-        const category = await categoryService.getCategoryById(req.params.id);
-        res.json(category);
-    }
+        const type = await transactionTypeService.getTransactionTypeById(req.params.id);
+        res.json(type);
+    } 
     catch (err) {
         res.status(err.status || 500).json({ error: err.message });
     }
 });
 
 /**
- *  @swagger
- *  /categories:
+ * @swagger
+ * /transaction_types:
  *   post:
- *     tags: [Categories]
- *     summary: Create a new category | Crear una nueva categoría
+ *     tags: [Transaction Types]
+ *     summary: Create a new transaction type | Crear un nuevo tipo de transacción
  *     requestBody:
  *       required: true
  *       content:
@@ -105,7 +105,7 @@ router.get('/:id', async (req, res) => {
  *                 type: string
  *     responses:
  *       201:
- *         description: Category created | Categoría creada
+ *         description: Transaction type created | Tipo de transacción creado
  *         content:
  *           application/json:
  *             schema:
@@ -118,14 +118,14 @@ router.get('/:id', async (req, res) => {
  *       400:
  *         description: Invalid input | Entrada inválida
  *       409:
- *         description: Category name already exists | El nombre de la categoría ya existe
+ *         description: Transaction type name already exists | El nombre del tipo de transacción ya existe
  *       500:
  *         description: Server error | Error del servidor
  */
 router.post('/', async (req, res) => {
     try {
-        const newCategory = await categoryService.createCategory(req.body);
-        res.status(201).json(newCategory);
+        const newType = await transactionTypeService.createTransactionType(req.body);
+        res.status(201).json(newType);
     } 
     catch (err) {
         res.status(err.status || 500).json({ error: err.message });
@@ -133,11 +133,11 @@ router.post('/', async (req, res) => {
 });
 
 /**
- *  @swagger
- *  /categories/{id}:
+ * @swagger
+ * /transaction_types/{id}:
  *   put:
- *     tags: [Categories]
- *     summary: Update an existing category | Actualizar una categoría existente
+ *     tags: [Transaction Types]
+ *     summary: Update an existing transaction type | Actualizar un tipo de transacción existente
  *     parameters:
  *       - in: path
  *         name: id
@@ -157,32 +157,32 @@ router.post('/', async (req, res) => {
  *                 type: string
  *     responses:
  *       200:
- *         description: Category updated | Categoría actualizada
+ *         description: Transaction type updated | Tipo de transacción actualizado
  *       400:
  *         description: Invalid input | Entrada inválida
  *       404:
- *         description: Category not found | Categoría no encontrada
+ *         description: Transaction type not found | Tipo de transacción no encontrado
  *       409:
- *         description: Category name already exists | El nombre de la categoría ya existe
+ *         description: Transaction type name already exists | El nombre del tipo de transacción ya existe
  *       500:
  *         description: Server error | Error del servidor
  */
 router.put('/:id', async (req, res) => {
     try {
-        await categoryService.updateCategory(req.params.id, req.body);
-        res.json({ message: 'Category updated' });
-    }   
+        await transactionTypeService.updateTransactionType(req.params.id, req.body);
+        res.json({ message: 'Transaction type updated' });
+    } 
     catch (err) {
         res.status(err.status || 500).json({ error: err.message });
     }
 });
 
 /**
- *  @swagger
- *  /categories/{id}:
+ * @swagger
+ * /transaction_types/{id}:
  *   delete:
- *     tags: [Categories]
- *     summary: Delete a category | Eliminar una categoría
+ *     tags: [Transaction Types]
+ *     summary: Delete a transaction type | Eliminar un tipo de transacción
  *     parameters:
  *       - in: path
  *         name: id
@@ -191,11 +191,11 @@ router.put('/:id', async (req, res) => {
  *           type: integer
  *     responses:
  *       200:
- *         description: Category deleted | Categoría eliminada
+ *         description: Transaction type deleted | Tipo de transacción eliminado
  *       400:
  *         description: Invalid ID | ID inválido
  *       404:
- *         description: Category not found | Categoría no encontrada
+ *         description: Transaction type not found | Tipo de transacción no encontrado
  *       409:
  *         description: Conflict, e.g., associated transactions exist | Conflicto, ej. existen transacciones asociadas
  *       500:
@@ -203,9 +203,9 @@ router.put('/:id', async (req, res) => {
  */
 router.delete('/:id', async (req, res) => {
     try {
-        await categoryService.deleteCategory(req.params.id);
-        res.json({ message: 'Category deleted' });
-    }
+        await transactionTypeService.deleteTransactionType(req.params.id);
+        res.json({ message: 'Transaction type deleted' });
+    } 
     catch (err) {
         res.status(err.status || 500).json({ error: err.message });
     }
