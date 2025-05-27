@@ -1,8 +1,8 @@
 // src/constants/errorMessages.mjs
 
 /**
- *  Módulo para centralizar los mensajes de error de la API.
- *  Esto mejora la consistencia y facilita la internacionalización futura.
+ * Módulo para centralizar los mensajes de error de la API.
+ * Esto mejora la consistencia y facilita la internacionalización futura.
  *
  * Module to centralize API error messages.
  * This improves consistency and facilitates future internationalization.
@@ -15,6 +15,7 @@ export const ERROR_MESSAGES = {
     NOT_FOUND: 'Recurso no encontrado.',
     NO_FIELDS_TO_UPDATE: 'No se proporcionaron campos para actualizar.',
     INVALID_ID: 'ID inválido. El ID debe ser un número entero positivo.',
+    MISSING_REQUIRED_FIELDS: 'Faltan campos obligatorios en la solicitud.', // Añadido para un mensaje más genérico
 
     // Errores de usuario / User errors
     USER: {
@@ -22,6 +23,8 @@ export const ERROR_MESSAGES = {
         ALREADY_EXISTS: 'El email ya está registrado.',
         INVALID_EMAIL_FORMAT: 'Formato de email inválido.',
         MISSING_FIELDS: 'Faltan campos obligatorios para crear el usuario.',
+        // Aunque isValidId ya tiene un mensaje general, podemos añadir uno específico si se quiere
+        // INVALID_ID: 'ID de usuario inválido. El ID debe ser un número entero positivo.', 
     },
 
     // Errores de perfil / Profile errors
@@ -53,6 +56,13 @@ export const ERROR_MESSAGES = {
         ALREADY_EXISTS: 'El nombre de la categoría ya existe.',
         NAME_REQUIRED: 'El nombre de la categoría es obligatorio.',
         ASSOCIATED_TRANSACTIONS_EXIST: 'No se puede eliminar la categoría: existen transacciones asociadas.',
+    },
+
+    // Errores de presupuesto / Budget errors (NUEVO)
+    BUDGET: {
+        NOT_FOUND: 'Presupuesto no encontrado.',
+        ALREADY_EXISTS: 'Ya existe un presupuesto para este usuario, categoría, año y mes.',
+        MISSING_FIELDS: 'Faltan campos obligatorios para crear o actualizar el presupuesto.',
     },
 
     // Errores de validación de existencia de foráneas

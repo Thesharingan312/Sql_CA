@@ -7,6 +7,7 @@ import transactionRoutes from './modules/transactions/transaction.controller.mjs
 import profileRoutes from './modules/profiles/profile.controller.mjs';
 import categoryRoutes from './modules/categories/category.controller.mjs';
 import transactionTypeRoutes from './modules/transaction_types/transaction_type.controller.mjs'
+import budgetTypeRoutes from './modules/budgets/budget.controller.mjs';
 import setupSwagger from '../docs/swagger.mjs'; // Ajusta la ruta si tu carpeta docs está en otro sitio
 
 const app = express();
@@ -18,6 +19,7 @@ app.use('/transactions', transactionRoutes);
 app.use('/profiles', profileRoutes);
 app.use('/categories', categoryRoutes);
 app.use('/transaction_types', transactionTypeRoutes);
+app.use('/budgets', budgetTypeRoutes)
 
 // Configura Swagger | Setup Swagger
 setupSwagger(app);
