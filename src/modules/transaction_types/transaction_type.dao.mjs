@@ -36,7 +36,7 @@ export async function createTransactionType({ name }) {
     );
     return { id: result.insertId, name };
 }
-
+//By @Thesharingan312
 /**
  *  Actualizar un tipo de transacción existente | Update an existing transaction type
  */

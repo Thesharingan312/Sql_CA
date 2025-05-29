@@ -79,7 +79,7 @@ export async function deleteUser(id) {
   const [result] = await db.query('DELETE FROM users WHERE id = ?', [id]);
   return result.affectedRows > 0;
 }
-
+//By @thesharingan312
 /**
  * Obtener usuarios por profile_id | Get users by profile ID
  */

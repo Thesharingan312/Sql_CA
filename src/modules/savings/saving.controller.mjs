@@ -1,7 +1,7 @@
-// src/modules/budgets/budget.controller.mjs
+// src/modules/savings/saving.controller.mjs
 
 import express from 'express';
-import * as budgetService from './budget.service.mjs';
+import * as savingService from './saving.service.mjs';
 import { ERROR_MESSAGES } from '../../constants/errorMessages.mjs';
 
 const router = express.Router();
@@ -9,16 +9,16 @@ const router = express.Router();
 /**
  *  @swagger
  *  tags:
- *   - name: Budgets
- *     description: Budget management | Gestión de presupuestos
+ *   - name: Savings
+ *     description: Savings management | Gestión de ahorros
  */
 
 /**
  *  @swagger
- *  /budgets:
+ *  /savings:
  *   get:
- *     tags: [Budgets]
- *     summary: Get all budgets (optionally filtered by user_id, category_id, year, month) | Obtener todos los presupuestos (opcionalmente filtrados)
+ *     tags: [Savings]
+ *     summary: Get all savings (optionally filtered by user_id, type_id) | Obtener todos los ahorros (opcionalmente filtrados por user_id, type_id)
  *     parameters:
  *       - in: query
  *         name: user_id
@@ -26,23 +26,13 @@ const router = express.Router();
  *           type: integer
  *         description: Filter by user ID | Filtrar por ID de usuario
  *       - in: query
- *         name: category_id
+ *         name: type_id
  *         schema:
  *           type: integer
- *         description: Filter by category ID | Filtrar por ID de categoría
- *       - in: query
- *         name: year
- *         schema:
- *           type: integer
- *         description: Filter by year | Filtrar por año
- *       - in: query
- *         name: month
- *         schema:
- *           type: integer
- *         description: Filter by month (1-12) | Filtrar por mes (1-12)
+ *         description: Filter by saving type ID | Filtrar por ID de tipo de ahorro
  *     responses:
  *       200:
- *         description: List of budgets | Lista de presupuestos
+ *         description: List of savings | Lista de ahorros
  *         content:
  *           application/json:
  *             schema:
@@ -54,13 +44,11 @@ const router = express.Router();
  *                     type: integer
  *                   user_id:
  *                     type: integer
- *                   category_id:
+ *                   type_id:
  *                     type: integer
- *                   year:
- *                     type: integer
- *                   month:
- *                     type: integer
- *                   total_amount:
+ *                   name:
+ *                     type: string
+ *                   amount:
  *                     type: number
  *                     format: float
  *                   notes:
@@ -74,38 +62,44 @@ const router = express.Router();
  *                     format: date-time
  *       500:
  *         description: Server error | Error del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
  */
 router.get('/', async (req, res) => {
     try {
         const filters = {
         user_id: req.query.user_id ? parseInt(req.query.user_id) : undefined,
-        category_id: req.query.category_id ? parseInt(req.query.category_id) : undefined,
-        year: req.query.year ? parseInt(req.query.year) : undefined,
-        month: req.query.month ? parseInt(req.query.month) : undefined,
+        type_id: req.query.type_id ? parseInt(req.query.type_id) : undefined,
         };
-        const budgets = await budgetService.getAllBudgets(filters);
-        res.json(budgets);
+        const savings = await savingService.getAllSavings(filters);
+        res.json(savings);
     } 
     catch (err) {
         res.status(err.status || 500).json({ error: err.message || ERROR_MESSAGES.SERVER_ERROR });
     }
-});
+    });
 
 /**
  *  @swagger
- *  /budgets/{id}:
+ *  /savings/{id}:
  *   get:
- *     tags: [Budgets]
- *     summary: Get budget by ID | Obtener presupuesto por ID
+ *     tags: [Savings]
+ *     summary: Get saving by ID | Obtener ahorro por ID
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: integer
+ *         description: Saving ID | ID del ahorro
  *     responses:
  *       200:
- *         description: Budget found | Presupuesto encontrado
+ *         description: Saving found | Ahorro encontrado
  *         content:
  *           application/json:
  *             schema:
@@ -115,13 +109,11 @@ router.get('/', async (req, res) => {
  *                   type: integer
  *                 user_id:
  *                   type: integer
- *                 category_id:
+ *                 type_id:
  *                   type: integer
- *                 year:
- *                   type: integer
- *                 month:
- *                   type: integer
- *                 total_amount:
+ *                 name:
+ *                   type: string
+ *                 amount:
  *                   type: number
  *                   format: float
  *                 notes:
@@ -136,26 +128,26 @@ router.get('/', async (req, res) => {
  *       400:
  *         description: Invalid ID | ID inválido
  *       404:
- *         description: Budget not found | Presupuesto no encontrado
+ *         description: Saving not found | Ahorro no encontrado
  *       500:
  *         description: Server error | Error del servidor
  */
 router.get('/:id', async (req, res) => {
     try {
-        const budget = await budgetService.getBudgetById(req.params.id);
-        res.json(budget);
+        const saving = await savingService.getSavingById(req.params.id);
+        res.json(saving);
     } 
     catch (err) {
         res.status(err.status || 500).json({ error: err.message || ERROR_MESSAGES.SERVER_ERROR });
     }
-});
+    });
 
 /**
  *  @swagger
- *  /budgets:
+ *  /savings:
  *   post:
- *     tags: [Budgets]
- *     summary: Create a new budget | Crear un nuevo presupuesto
+ *     tags: [Savings]
+ *     summary: Create a new saving | Crear un nuevo ahorro
  *     requestBody:
  *       required: true
  *       content:
@@ -164,20 +156,17 @@ router.get('/:id', async (req, res) => {
  *             type: object
  *             required:
  *               - user_id
- *               - category_id
- *               - year
- *               - month
- *               - total_amount
+ *               - type_id
+ *               - name
+ *               - amount
  *             properties:
  *               user_id:
  *                 type: integer
- *               category_id:
+ *               type_id:
  *                 type: integer
- *               year:
- *                 type: integer
- *               month:
- *                 type: integer
- *               total_amount:
+ *               name:
+ *                 type: string
+ *               amount:
  *                 type: number
  *                 format: float
  *               notes:
@@ -185,30 +174,28 @@ router.get('/:id', async (req, res) => {
  *                 nullable: true
  *     responses:
  *       201:
- *         description: Budget created | Presupuesto creado
+ *         description: Saving created | Ahorro creado
  *       400:
  *         description: Invalid input | Entrada inválida
- *       409:
- *         description: Budget already exists | El presupuesto ya existe
  *       500:
  *         description: Server error | Error del servidor
  */
 router.post('/', async (req, res) => {
     try {
-        const newBudget = await budgetService.createBudget(req.body);
-        res.status(201).json(newBudget);
+        const newSaving = await savingService.createSaving(req.body);
+        res.status(201).json(newSaving);
     } 
     catch (err) {
         res.status(err.status || 500).json({ error: err.message || ERROR_MESSAGES.SERVER_ERROR });
     }
-});
+    });
 
 /**
  *  @swagger
- *  /budgets/{id}:
+ *  /savings/{id}:
  *   put:
- *     tags: [Budgets]
- *     summary: Update an existing budget | Actualizar un presupuesto existente
+ *     tags: [Savings]
+ *     summary: Update an existing saving | Actualizar un ahorro existente
  *     parameters:
  *       - in: path
  *         name: id
@@ -223,20 +210,17 @@ router.post('/', async (req, res) => {
  *             type: object
  *             required:
  *               - user_id
- *               - category_id
- *               - year
- *               - month
- *               - total_amount
+ *               - type_id
+ *               - name
+ *               - amount
  *             properties:
  *               user_id:
  *                 type: integer
- *               category_id:
+ *               type_id:
  *                 type: integer
- *               year:
- *                 type: integer
- *               month:
- *                 type: integer
- *               total_amount:
+ *               name:
+ *                 type: string
+ *               amount:
  *                 type: number
  *                 format: float
  *               notes:
@@ -244,32 +228,30 @@ router.post('/', async (req, res) => {
  *                 nullable: true
  *     responses:
  *       200:
- *         description: Budget updated | Presupuesto actualizado
+ *         description: Saving updated | Ahorro actualizado
  *       400:
- *         description: Invalid request | Solicitud inválida
+ *         description: Invalid input | Entrada inválida
  *       404:
- *         description: Budget not found | Presupuesto no encontrado
- *       409:
- *         description: Budget already exists | El presupuesto ya existe
+ *         description: Saving not found | Ahorro no encontrado
  *       500:
  *         description: Server error | Error del servidor
  */
 router.put('/:id', async (req, res) => {
     try {
-        await budgetService.updateBudget(req.params.id, req.body);
-        res.json({ message: 'Budget updated' });
+        await savingService.updateSaving(req.params.id, req.body);
+        res.json({ message: 'Saving updated' });
     } 
     catch (err) {
         res.status(err.status || 500).json({ error: err.message || ERROR_MESSAGES.SERVER_ERROR });
     }
-});
+    });
 
 /**
  *  @swagger
- *  /budgets/{id}:
+ *  /savings/{id}:
  *   patch:
- *     tags: [Budgets]
- *     summary: Partially update a budget | Actualizar parcialmente un presupuesto
+ *     tags: [Savings]
+ *     summary: Partially update a saving | Actualizar parcialmente un ahorro
  *     parameters:
  *       - in: path
  *         name: id
@@ -277,7 +259,6 @@ router.put('/:id', async (req, res) => {
  *         schema:
  *           type: integer
  *     requestBody:
- *       required: true
  *       content:
  *         application/json:
  *           schema:
@@ -285,13 +266,11 @@ router.put('/:id', async (req, res) => {
  *             properties:
  *               user_id:
  *                 type: integer
- *               category_id:
+ *               type_id:
  *                 type: integer
- *               year:
- *                 type: integer
- *               month:
- *                 type: integer
- *               total_amount:
+ *               name:
+ *                 type: string
+ *               amount:
  *                 type: number
  *                 format: float
  *               notes:
@@ -299,32 +278,30 @@ router.put('/:id', async (req, res) => {
  *                 nullable: true
  *     responses:
  *       200:
- *         description: Budget partially updated | Presupuesto parcialmente actualizado
+ *         description: Saving partially updated | Ahorro parcialmente actualizado
  *       400:
- *         description: Invalid request | Solicitud inválida
+ *         description: Invalid input | Entrada inválida
  *       404:
- *         description: Budget not found | Presupuesto no encontrado
- *       409:
- *         description: Budget already exists | El presupuesto ya existe
+ *         description: Saving not found | Ahorro no encontrado
  *       500:
  *         description: Server error | Error del servidor
  */
 router.patch('/:id', async (req, res) => {
     try {
-        await budgetService.patchBudget(req.params.id, req.body);
-        res.json({ message: 'Budget patched' });
+        await savingService.patchSaving(req.params.id, req.body);
+        res.json({ message: 'Saving patched' });
     } 
     catch (err) {
         res.status(err.status || 500).json({ error: err.message || ERROR_MESSAGES.SERVER_ERROR });
     }
-});
+    });
 
 /**
  *  @swagger
- *  /budgets/{id}:
+ *  /savings/{id}:
  *   delete:
- *     tags: [Budgets]
- *     summary: Delete a budget | Eliminar un presupuesto
+ *     tags: [Savings]
+ *     summary: Delete a saving | Eliminar un ahorro
  *     parameters:
  *       - in: path
  *         name: id
@@ -333,22 +310,22 @@ router.patch('/:id', async (req, res) => {
  *           type: integer
  *     responses:
  *       200:
- *         description: Budget deleted | Presupuesto eliminado
+ *         description: Saving deleted | Ahorro eliminado
  *       400:
  *         description: Invalid ID | ID inválido
  *       404:
- *         description: Budget not found | Presupuesto no encontrado
+ *         description: Saving not found | Ahorro no encontrado
  *       500:
  *         description: Server error | Error del servidor
  */
 router.delete('/:id', async (req, res) => {
     try {
-        await budgetService.deleteBudget(req.params.id);
-        res.json({ message: 'Budget deleted' });
-    }
+        await savingService.deleteSaving(req.params.id);
+        res.json({ message: 'Saving deleted' });
+    } 
     catch (err) {
         res.status(err.status || 500).json({ error: err.message || ERROR_MESSAGES.SERVER_ERROR });
     }
-});
+    });
 
 export default router;

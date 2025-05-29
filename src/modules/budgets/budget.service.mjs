@@ -9,13 +9,13 @@ import {
     isValidPositiveNumber,
     validateRequiredFields,
     isValidYearMonth,
-    validatePatchBudgetFields, // La nueva función
+    validatePatchBudgetFields, 
     createError // Para crear errores directamente si la validación no es centralizada en una función
 } from '../../utils/validation.mjs';
 import { ERROR_MESSAGES } from '../../constants/errorMessages.mjs';
 
 /**
- * Obtener todos los presupuestos con filtros | Get all budgets with filters
+ *  Obtener todos los presupuestos con filtros | Get all budgets with filters
  */
 export async function getAllBudgets(filter) {
     // Validación de filtros usando funciones de validación centralizadas
@@ -196,7 +196,7 @@ export async function patchBudget(id, fields) {
 }
 
 /**
- * Eliminar un presupuesto por ID | Delete a budget by ID
+ *  Eliminar un presupuesto por ID | Delete a budget by ID
  */
 export async function deleteBudget(id) {
     isValidId(id, ERROR_MESSAGES.INVALID_ID);

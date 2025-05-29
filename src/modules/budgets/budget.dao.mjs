@@ -3,8 +3,8 @@
 import db from '../../db/DBHelper.mjs';
 
 /**
- * Obtener todos los presupuestos con filtros opcionales y datos enriquecidos
- * Get all budgets with optional filters and enriched data
+ *  Obtener todos los presupuestos con filtros opcionales y datos enriquecidos
+ *  Get all budgets with optional filters and enriched data
  */
 export async function getAllBudgets({ user_id, category_id, year, month } = {}) {
     let sql = `
@@ -51,7 +51,7 @@ export async function getAllBudgets({ user_id, category_id, year, month } = {}) 
 }
 
 /**
- * Obtener presupuesto por ID | Get budget by ID
+ *  Obtener presupuesto por ID | Get budget by ID
  */
 export async function getBudgetById(id) {
     const [rows] = await db.query('SELECT * FROM budgets WHERE id = ?', [id]);
@@ -59,8 +59,8 @@ export async function getBudgetById(id) {
 }
 
 /**
- * Verificar si un usuario existe | Check if a user exists
- * (Esta función debería idealmente ser importada de user.dao.mjs)
+ *  Verificar si un usuario existe | Check if a user exists
+ *  (Esta función debería idealmente ser importada de user.dao.mjs)
  */
 export async function userExists(user_id) {
     const [rows] = await db.query('SELECT id FROM users WHERE id = ?', [user_id]);
@@ -68,8 +68,8 @@ export async function userExists(user_id) {
 }
 
 /**
- * Verificar si una categoría existe | Check if a category exists
- * (Esta función debería idealmente ser importada de category.dao.mjs)
+ *  Verificar si una categoría existe | Check if a category exists
+ *  (Esta función debería idealmente ser importada de category.dao.mjs)
  */
 export async function categoryExists(category_id) {
     const [rows] = await db.query('SELECT id FROM categories WHERE id = ?', [category_id]);
@@ -77,8 +77,8 @@ export async function categoryExists(category_id) {
 }
 
 /**
- * Verificar si ya existe un presupuesto para un usuario, categoría, año y mes.
- * Check if a budget already exists for a user, category, year, and month.
+ *  Verificar si ya existe un presupuesto para un usuario, categoría, año y mes.
+ *  Check if a budget already exists for a user, category, year, and month.
  */
 export async function getExistingBudgetForPeriod(user_id, category_id, year, month, excludeBudgetId = null) {
     let sql = `
@@ -98,7 +98,7 @@ export async function getExistingBudgetForPeriod(user_id, category_id, year, mon
 
 
 /**
- * Crear un nuevo presupuesto | Create a new budget
+ *  Crear un nuevo presupuesto | Create a new budget
  */
 export async function createBudget({ user_id, category_id, year, month, total_amount, notes }) {
     const [result] = await db.query(
@@ -109,7 +109,7 @@ export async function createBudget({ user_id, category_id, year, month, total_am
 }
 
 /**
- * Actualizar un presupuesto existente (PUT) | Update an existing budget (PUT)
+ *  Actualizar un presupuesto existente (PUT) | Update an existing budget (PUT)
  */
 export async function updateBudget(id, { user_id, category_id, year, month, total_amount, notes }) {
     const [result] = await db.query(
@@ -120,7 +120,7 @@ export async function updateBudget(id, { user_id, category_id, year, month, tota
 }
 
 /**
- * Actualizar parcialmente un presupuesto (PATCH) | Partially update a budget (PATCH)
+ *  Actualizar parcialmente un presupuesto (PATCH) | Partially update a budget (PATCH)
  */
 export async function patchBudget(id, fields) {
     const keys = Object.keys(fields);
@@ -148,9 +148,9 @@ export async function patchBudget(id, fields) {
     );
     return result.affectedRows > 0;
 }
-
+//By @Thesharingan312
 /**
- * Eliminar un presupuesto por ID | Delete a budget by ID
+ *  Eliminar un presupuesto por ID | Delete a budget by ID
  */
 export async function deleteBudget(id) {
     const [result] = await db.query('DELETE FROM budgets WHERE id = ?', [id]);

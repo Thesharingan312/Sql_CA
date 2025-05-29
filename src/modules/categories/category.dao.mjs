@@ -47,7 +47,7 @@ export async function updateCategory(id, { name }) {
     );
     return result.affectedRows > 0;
 }
-
+//By @Thesharingan312
 /**
  *  Eliminar una categoría por ID | Delete a category by ID
  */

@@ -138,7 +138,7 @@ export async function getTransactionsByTypeId(typeId) {
   );
   return rows;
 }
-
+//By @Thesharingan312
 /**
  * Obtener transacciones por ID de categoría
  * Get transactions by category ID

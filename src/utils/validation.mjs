@@ -119,7 +119,7 @@ export function isValidYearMonth(year, month, errorMessage = ERROR_MESSAGES.BAD_
  *  @param {object} fields - Campos a actualizar.
  *  @param {object} existingBudget - El presupuesto existente.
  *  @param {object} daos - Objeto con funciones DAO necesarias (ej. { getUserById, getCategoryById }).
- *  @returns {{year: number, month: number}} - El año y el mes final validados.
+ *  @returns {Promise{object}} - El año y el mes final validados.
  *  @throws {Error} Si alguna validación falla.
  */
 export async function validatePatchBudgetFields(fields, existingBudget, daos) { // Ya no necesita ERROR_MESSAGES como parámetro

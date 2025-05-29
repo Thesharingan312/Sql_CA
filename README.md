@@ -1,6 +1,6 @@
 # MoneyShield API
 
-A RESTful API backend for the MoneyShield financial management application. This API provides endpoints for managing users, profiles, transaction types, categories, transactions, and budgets.
+A RESTful API backend for the MoneyShield financial management application. This API provides endpoints for managing users, profiles, transaction types, categories, transactions, budgets, and savings.
 
 ## Table of Contents
 
@@ -26,7 +26,7 @@ A RESTful API backend for the MoneyShield financial management application. This
 
 ## Overview
 
-MoneyShield API is a Node.js Express server application that connects to a MySQL database to manage financial data. It implements complete CRUD operations (Create, Read, Update, Delete) for core entities like users, **profiles**, **transaction types**, **categories**, and **transactions**, providing a comprehensive backend solution for a personal finance management application. Future modules like budgets and savings will further enhance its capabilities.
+MoneyShield API is a Node.js Express server application that connects to a MySQL database to manage financial data. It implements complete CRUD operations (Create, Read, Update, Delete) for core entities like users, **profiles**, **transaction types**, **categories**, **transactions**, **budgets**, and **savings**, providing a comprehensive backend solution for a personal finance management application.
 
 ## Requirements
 
@@ -72,12 +72,18 @@ MoneyShield API is a Node.js Express server application that connects to a MySQL
     CREATE DATABASE IF NOT EXISTS moneyshield;
     USE moneyshield;
     ```
-4.  **Run the SQL schema script** to create the necessary tables. (Assuming you have a `schema.sql` or similar file in a `database` directory):
-    ```bash
-    # Example: If you have a schema.sql file
-    mysql -u your_user -p moneyshield < database/schema.sql
-    ```
-    _If you don't have a `schema.sql` file, you will need to create the tables manually based on the database diagram._
+4.  **Run the SQL schema scripts** to create the necessary tables. You will need to create the following tables in your `moneyshield` database, typically by executing their `CREATE TABLE` statements:
+
+    * `users`
+    * `profiles`
+    * `transaction_types`
+    * `categories`
+    * `transactions`
+    * `saving_types`
+    * `savings`
+    * `budgets`
+
+    (Ensure foreign key constraints are correctly set up as per the database diagram.)
 
 ## API Documentation
 
@@ -103,13 +109,13 @@ Manages spending and income categories (e.g., 'Groceries', 'Utilities', 'Salary'
 
 Manages individual financial transactions, linking them to users, transaction types, and categories.
 
-### Budgets (Future)
+### Budgets
 
-Will provide functionality for setting and tracking financial budgets for users.
+Provides functionality for setting and tracking financial budgets for users, linked to categories.
 
-### Savings (Future)
+### Savings
 
-Will handle savings goals and progress tracking for users.
+Handles savings goals and progress tracking for users, linked to specific saving types.
 
 ## Error Handling
 
@@ -159,8 +165,13 @@ To add new endpoints, follow the established pattern:
     -   Check that the user has access to the specified database
 
 3.  **Table doesn't exist**
-    -   Ensure the database schema has been properly set up (run `schema.sql` if applicable)
+    -   Ensure the database schema has been properly set up (run `schema.sql` if applicable, or manually create tables as listed in "Database Setup")
     -   Verify table names match exactly what's referenced in the code
+
+4.  **Module Not Found (ERR_MODULE_NOT_FOUND)**
+    -   Verify that the file path in the `import` statement is correct.
+    -   Ensure the file (`.mjs`) physically exists in the specified directory and has the correct filename (case-sensitive).
+    -   Check for typos in directory or file names.
 
 ## Contributing
 
@@ -175,4 +186,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-Created for MoneyShield © 2025
+Created for MoneyShield © 2025 . All rights reserved. By @Thesharingan312

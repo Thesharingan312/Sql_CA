@@ -1,11 +1,11 @@
 // src/constants/errorMessages.mjs
 
 /**
- * Módulo para centralizar los mensajes de error de la API.
- * Esto mejora la consistencia y facilita la internacionalización futura.
+ *  Módulo para centralizar los mensajes de error de la API.
+ *  Esto mejora la consistencia y facilita la internacionalización futura.
  *
- * Module to centralize API error messages.
- * This improves consistency and facilitates future internationalization.
+ *  Module to centralize API error messages.
+ *  This improves consistency and facilitates future internationalization.
  */
 
 export const ERROR_MESSAGES = {
@@ -49,7 +49,7 @@ export const ERROR_MESSAGES = {
         NAME_REQUIRED: 'El nombre del tipo de transacción es obligatorio.',
         ASSOCIATED_TRANSACTIONS_EXIST: 'No se puede eliminar el tipo de transacción: existen transacciones asociadas.',
     },
-
+//By @Thesharingan312
     // Errores de categoría / Category errors
     CATEGORY: {
         NOT_FOUND: 'Categoría no encontrada.',

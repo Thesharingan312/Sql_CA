@@ -47,7 +47,7 @@ export async function updateProfile(id, { name }) {
     );
     return result.affectedRows > 0;
 }
-
+//By @Thesharingan312
 /**
  *  Eliminar un perfil por ID | Delete a profile by ID
  */
