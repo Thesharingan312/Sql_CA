@@ -1,0 +1,30 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "MoneyShield",
+            "envFile": "${workspaceFolder}/.env",
+            "runtimeArgs": [
+                "--env-file=.env"
+            ],
+            "args": [
+                "${workspaceFolder}/src/index.mjs"
+            ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "outputCapture": "std"
+        },
+        {
+            "name": "MoneyShield tests",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "test"],
+            "outputCapture": "std"
+        }
+    ]
+}
