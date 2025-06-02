@@ -6,14 +6,14 @@ import { isValidId, validateRequiredFields } from '../../utils/validation.mjs';
 import { ERROR_MESSAGES } from '../../constants/errorMessages.mjs'; 
 
 /**
- * Obtener todos los tipos de transacción | Get all transaction types
+ *  Obtener todos los tipos de transacción | Get all transaction types
  */
 export async function getAllTransactionTypes() {
     return await transactionTypeDao.getAllTransactionTypes();
 }
 
 /**
- * Obtener un tipo de transacción por ID | Get a transaction type by ID
+ *  Obtener un tipo de transacción por ID | Get a transaction type by ID
  */
 export async function getTransactionTypeById(id) {
     isValidId(id, 'Transaction Type ID'); // MODIFICADO
@@ -27,7 +27,7 @@ export async function getTransactionTypeById(id) {
 }
 
 /**
- * Crear un nuevo tipo de transacción | Create a new transaction type
+ *  Crear un nuevo tipo de transacción | Create a new transaction type
  */
 export async function createTransactionType(typeData) {
     // MODIFICADO: Usar validateRequiredFields para el nombre
@@ -45,7 +45,7 @@ export async function createTransactionType(typeData) {
 }
 
 /**
- * Actualizar un tipo de transacción existente | Update an existing transaction type
+ *  Actualizar un tipo de transacción existente | Update an existing transaction type
  */
 export async function updateTransactionType(id, typeData) {
     isValidId(id, 'Transaction Type ID'); // MODIFICADO
@@ -82,7 +82,7 @@ export async function updateTransactionType(id, typeData) {
 }
 
 /**
- * Eliminar un tipo de transacción por ID | Delete a transaction type by ID
+ *  Eliminar un tipo de transacción por ID | Delete a transaction type by ID
  */
 export async function deleteTransactionType(id) {
     isValidId(id, 'Transaction Type ID'); // MODIFICADO
