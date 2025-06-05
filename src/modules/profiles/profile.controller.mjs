@@ -39,7 +39,8 @@ router.get('/', async (req, res) => {
     try {
     const profiles = await profileService.getAllProfiles();
     res.json(profiles);
-    } catch (err) {
+    } 
+    catch (err) {
     res.status(err.status || 500).json({ error: err.message });
     }
 });
@@ -79,7 +80,8 @@ router.get('/:id', async (req, res) => {
     try {
     const profile = await profileService.getProfileById(req.params.id);
     res.json(profile);
-    } catch (err) {
+    } 
+    catch (err) {
     res.status(err.status || 500).json({ error: err.message });
     }
 });
@@ -124,7 +126,8 @@ router.post('/', async (req, res) => {
     try {
     const newProfile = await profileService.createProfile(req.body);
     res.status(201).json(newProfile);
-    } catch (err) {
+    } 
+    catch (err) {
     res.status(err.status || 500).json({ error: err.message });
     }
 });
@@ -168,7 +171,8 @@ router.put('/:id', async (req, res) => {
     try {
     await profileService.updateProfile(req.params.id, req.body);
     res.json({ message: 'Profile updated' });
-    } catch (err) {
+    } 
+    catch (err) {
     res.status(err.status || 500).json({ error: err.message });
     }
 });
@@ -201,7 +205,8 @@ router.delete('/:id', async (req, res) => {
     try {
     await profileService.deleteProfile(req.params.id);
     res.json({ message: 'Profile deleted' });
-    } catch (err) {
+    } 
+    catch (err) {
     res.status(err.status || 500).json({ error: err.message });
     }
 });
